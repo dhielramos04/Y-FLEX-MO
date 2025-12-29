@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Y-FLEX MO | Sign In / Sign Up</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK Imports -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            setDoc, 
+            doc 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // Removed the problematic import and call to setLogLevel from firebase-app-check.js
+        // import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app-check.js";
+        // setLogLevel('debug'); // Removed this line
+
+        // --- GLOBAL VARIABLES (Provided by Canvas) ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let auth, db;
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+
+        // --- DOM Elements ---
+        const signUpForm = document.getElementById('signUpForm');
+        const loginForm = document.getElementById('loginForm');
+        const authMessage = document.getElementById('authMessage');
+        const toggleLogin = document.getElementById('toggleLogin');
+        const toggleSignUp = document.getElementById('toggleSignUp');
+        const cardTitle = document.getElementById('cardTitle');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+
+        // --- Utility Functions ---
+        const showMessage = (message, isError = false) => {
+            authMessage.textContent = message;
+            authMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+            if (isError) {
+                authMessage.classList.add('bg-red-100', 'text-red-700');
+            } else {
+                authMessage.classList.add('bg-green-100', 'text-green-700');
+            }
+        };
+
+        const showLoading = (show) => {
+            loadingIndicator.classList.toggle('hidden', !show);
+        };
+
+        const redirectToDashboard = () => {
+            // NOTE: Replace 'index.html' with the actual dashboard path if different
+            window.location.href = 'index.html'; 
+        };
+
+        // --- Authentication Logic ---
+
+        // 1. Initial Custom Token Sign In (Canvas Requirement)
+        const initialAuth = async () => {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                    console.log("Successfully signed in with custom token.");
+                } else {
+                    await signInAnonymously(auth);
+                    console.log("Signed in anonymously.");
+                }
+            } catch (error) {
+                console.error("Initial Auth Error:", error.message);
+                showMessage("Authentication setup failed. Please refresh the page.", true);
+            }
+        };
+        initialAuth();
+
+        // 2. Auth State Listener (Handles successful sign-in/up)
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email) {
+                // If a non-anonymous user logs in successfully, redirect them
+                // We keep anonymous sign-in in the background for utility, but only redirect known users.
+                // Redirect logic is typically handled after a successful form submission,
+                // but this listener ensures the session is managed correctly.
+            }
+        });
+
+        // 3. Log In Handler
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = loginForm.email.value;
+            const password = loginForm.password.value;
+            
+            showMessage('');
+            showLoading(true);
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showMessage('Login successful! Redirecting...', false);
+                // Redirect immediately after successful sign-in
+                setTimeout(redirectToDashboard, 1500);
+            } catch (error) {
+                console.error('Login Error:', error.message);
+                let errorMessage = 'Login failed. Invalid credentials or user not found.';
+                if (error.code === 'auth/wrong-password') {
+                    errorMessage = 'Incorrect password. Please try again.';
+                } else if (error.code === 'auth/user-not-found') {
+                    errorMessage = 'Email address not registered.';
+                }
+                showMessage(errorMessage, true);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // 4. Sign Up Handler
+        signUpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = signUpForm.email.value;
+            const password = signUpForm.password.value;
+            const name = signUpForm.name.value;
+            const isAccepted = signUpForm.terms.checked;
+
+            if (!isAccepted) {
+                showMessage("You must accept the Terms and Conditions to proceed.", true);
+                return;
+            }
+
+            showMessage('');
+            showLoading(true);
+
+            try {
+                // 1. Create User
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2. Store User Data (Private collection for the user)
+                const userRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'info');
+                await setDoc(userRef, {
+                    name: name,
+                    email: email,
+                    urs_learner: true,
+                    created_at: new Date().toISOString()
+                });
+
+                showMessage('Registration successful! Redirecting to dashboard...', false);
+                // Redirect immediately after successful registration
+                setTimeout(redirectToDashboard, 1500);
+
+            } catch (error) {
+                console.error('Sign Up Error:', error.message);
+                let errorMessage = 'Registration failed. Please try again.';
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = 'This email is already in use. Try logging in.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = 'Password should be at least 6 characters.';
+                }
+                showMessage(errorMessage, true);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // --- UI Toggles ---
+        const showSignUp = () => {
+            signUpForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+            cardTitle.textContent = 'Create Your URS Learner Account';
+            authMessage.classList.add('hidden');
+        };
+
+        const showLogin = () => {
+            loginForm.classList.remove('hidden');
+            signUpForm.classList.add('hidden');
+            cardTitle.textContent = 'Log In to Y-FLEX MO';
+            authMessage.classList.add('hidden');
+        };
+
+        toggleLogin.addEventListener('click', showLogin);
+        toggleSignUp.addEventListener('click', showSignUp);
+
+        // Initialize to Sign Up view by default
+        showSignUp(); 
+
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .cta-gradient {
+            background-image: linear-gradient(90deg, #10b981 0%, #2dd4bf 100%);
+        }
+        /* Custom scrollbar for T&C box */
+        #terms-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        #terms-container::-webkit-scrollbar-thumb {
+            background-color: #10b981;
+            border-radius: 3px;
+        }
+        #terms-container::-webkit-scrollbar-track {
+            background-color: #f0fdf4;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#0A0A0A',
+                        'primary-light': '#ffffff',
+                        'vibrant-green': '#10b981',
+                        'teal-accent': '#2dd4bf',
+                        'card-bg': '#f9fafb',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-card-bg flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-md">
+        
+        <!-- Logo/Brand -->
+        <div class="text-center mb-8">
+            <a href="#" class="text-3xl font-extrabold text-vibrant-green flex items-center justify-center space-x-2">
+                <span class="text-4xl">&#127793;</span>
+                <span>Y-FLEX MO</span>
+            </a>
+            <p class="text-sm text-primary-dark/60 mt-2">URS Digital Learning Platform</p>
+        </div>
+
+        <!-- Authentication Card -->
+        <div class="bg-primary-light p-8 md:p-10 rounded-3xl shadow-2xl border border-primary-dark/10">
+            <h1 id="cardTitle" class="text-2xl font-bold text-primary-dark mb-6 text-center"></h1>
+            
+            <!-- Message Area -->
+            <div id="authMessage" class="hidden p-3 mb-4 text-sm rounded-lg text-center" role="alert"></div>
+            
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="hidden text-center mb-4">
+                <div class="w-6 h-6 border-4 border-vibrant-green border-t-transparent border-solid rounded-full animate-spin mx-auto"></div>
+                <p class="text-xs text-vibrant-green mt-2">Processing...</p>
+            </div>
+
+            <!-- 1. Sign Up Form -->
+            <form id="signUpForm" class="space-y-4 hidden">
+                <div>
+                    <label for="signup-name" class="block text-sm font-medium text-primary-dark/70 mb-1">Full Name</label>
+                    <input type="text" id="signup-name" name="name" required 
+                           class="w-full px-4 py-3 border border-highlight-gray rounded-xl focus:ring-vibrant-green focus:border-vibrant-green transition duration-200">
+                </div>
+                <div>
+                    <label for="signup-email" class="block text-sm font-medium text-primary-dark/70 mb-1">URS Email Address</label>
+                    <input type="email" id="signup-email" name="email" required 
+                           class="w-full px-4 py-3 border border-highlight-gray rounded-xl focus:ring-vibrant-green focus:border-vibrant-green transition duration-200">
+                </div>
+                <div>
+                    <label for="signup-password" class="block text-sm font-medium text-primary-dark/70 mb-1">Create Password (Min 6 characters)</label>
+                    <input type="password" id="signup-password" name="password" required 
+                           class="w-full px-4 py-3 border border-highlight-gray rounded-xl focus:ring-vibrant-green focus:border-vibrant-green transition duration-200">
+                </div>
+
+                <!-- Terms and Conditions for Minors -->
+                <div class="pt-4 border-t border-highlight-gray/50">
+                    <p class="text-sm font-semibold mb-2 text-primary-dark">Terms & Conditions (URS Learners)</p>
+                    <div id="terms-container" class="h-32 p-3 bg-card-bg border border-vibrant-green/30 rounded-lg overflow-y-scroll text-xs text-primary-dark/70 space-y-2">
+                        <p class="font-bold text-vibrant-green">SECTION 1: USE BY MINORS (URS STUDENTS)</p>
+                        <p>This application is designed for educational use by students of the University of Rizal System (URS). By checking the box below, you confirm that you are a URS student. If you are under the age of 18, your parent or legal guardian must have been informed about your use of this application as a required or supplementary learning material, and they acknowledge and consent to your use.</p>
+                        
+                        <p class="font-bold text-teal-accent">SECTION 2: DATA PRIVACY</p>
+                        <p>We collect necessary usage data and progress tracking information solely for research and grading purposes within the URS academic context. Your personal information (name, email) will be kept confidential and will not be shared outside the scope of the research team and designated faculty, strictly following URS data privacy policies.</p>
+                        
+                        <p class="font-bold text-teal-accent">SECTION 3: ACADEMIC INTEGRITY</p>
+                        <p>All activities and assessments within this platform are subject to the URS policy on academic integrity.</p>
+                    </div>
+
+                    <div class="mt-4 flex items-start">
+                        <input id="terms" name="terms" type="checkbox" required
+                               class="h-4 w-4 text-vibrant-green border-highlight-gray rounded mt-1 focus:ring-vibrant-green">
+                        <label for="terms" class="ml-3 text-sm text-primary-dark/80">
+                            I accept the Terms and Conditions, and affirm that, if a minor, my parent/guardian has been notified.
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Sign Up Button -->
+                <button type="submit" class="w-full px-4 py-3 text-lg font-bold rounded-full cta-gradient text-white shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-[1.01]">
+                    Sign Up Now
+                </button>
+
+                <p class="text-center text-sm text-primary-dark/60 mt-4">
+                    Already have an account? 
+                    <button type="button" id="toggleLogin" class="text-vibrant-green font-semibold hover:underline transition duration-200">
+                        Log In
+                    </button>
+                </p>
+            </form>
+
+            <!-- 2. Log In Form -->
+            <form id="loginForm" class="space-y-4 hidden">
+                <div>
+                    <label for="login-email" class="block text-sm font-medium text-primary-dark/70 mb-1">Email Address</label>
+                    <input type="email" id="login-email" name="email" required 
+                           class="w-full px-4 py-3 border border-highlight-gray rounded-xl focus:ring-vibrant-green focus:border-vibrant-green transition duration-200">
+                </div>
+                <div>
+                    <label for="login-password" class="block text-sm font-medium text-primary-dark/70 mb-1">Password</label>
+                    <input type="password" id="login-password" name="password" required 
+                           class="w-full px-4 py-3 border border-highlight-gray rounded-xl focus:ring-vibrant-green focus:border-vibrant-green transition duration-200">
+                </div>
+
+                <!-- Log In Button -->
+                <button type="submit" class="w-full px-4 py-3 text-lg font-bold rounded-full cta-gradient text-white shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-[1.01]">
+                    Log In
+                </button>
+
+                <p class="text-center text-sm text-primary-dark/60 mt-4">
+                    New URS Learner? 
+                    <button type="button" id="toggleSignUp" class="text-vibrant-green font-semibold hover:underline transition duration-200">
+                        Create Account
+                    </button>
+                </p>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

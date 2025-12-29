@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Daily Flow | Y-FLEX MO Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        /* Custom gradient for buttons - NOW GREEN/TEAL */
+        .cta-gradient {
+            background-image: linear-gradient(90deg, #10b981 0%, #2dd4bf 100%);
+        }
+        /* New Dark Theme Colors */
+        .bg-dark-primary { background-color: #0A0A0A; } /* Near Black - Main Background */
+        .bg-dark-card { background-color: #1A1A1A; } /* Slightly Lighter Dark Gray - Card Backgrounds */
+        .text-light-100 { color: #f3f4f6; } /* Light Gray - Primary Text */
+        .text-light-200 { color: #e5e7eb; } /* Lighter Gray - Secondary Text */
+        .border-dark-light { border-color: #2a2a2a; } /* Dark Border for accents */
+
+        /* Custom subtle shadow for main active card */
+        .challenge-glow-dark {
+            box-shadow: 0 4px 60px -10px rgba(16, 185, 129, 0.25), 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Adjustments for the new sidebar layout */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 80px 1fr; /* Fixed sidebar width, rest for main content */
+            min-height: 100vh;
+        }
+
+        /* Circular Progress Bar styles */
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Original palette (kept for reference, but primary-dark/light are overridden by dark-primary/card in style block)
+                        'primary-dark': '#0A0A0A', 
+                        'primary-light': '#ffffff',
+                        'vibrant-green': '#10b981', /* Emerald 500 - Primary Green Accent */
+                        'teal-accent': '#2dd4bf', /* Teal 400 - Secondary Green/Teal Accent */
+                        'highlight-gray': '#e5e7eb',
+                        'card-bg': '#f9fafb',
+
+                        // New Dark Mode Colors (override where needed)
+                        'dark-bg-primary': '#0A0A0A', /* Main background */
+                        'dark-card-bg': '#1A1A1A', /* Card backgrounds */
+                        'dark-border': '#2a2a2a', /* Subtle border color */
+                        'dark-text-primary': '#f3f4f6', /* Main text color */
+                        'dark-text-secondary': '#a0a0a0', /* Secondary text color */
+                        'dark-hover': '#252525', /* Hover state for interactive elements */
+                        'dark-active-sidebar': '#10b981', /* Active item in sidebar */
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-primary text-dark-text-primary antialiased min-h-screen">
+
+    <div class="grid-container">
+        
+        <aside class="w-20 bg-dark-card border-r border-dark-border flex flex-col items-center py-6 rounded-r-3xl">
+            <a href="#" class="mb-10 text-vibrant-green font-extrabold text-2xl">Y</a>
+            <nav class="flex flex-col space-y-6">
+                <a href="#" class="p-2 rounded-xl text-vibrant-green bg-vibrant-green/10" aria-current="page" title="Dashboard">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                </a>
+                <a href="#" class="p-2 rounded-xl text-dark-text-secondary hover:bg-dark-hover hover:text-vibrant-green transition duration-200" title="Challenges">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0114 0v-2.101a1 1 0 012 0v2.101a9.002 9.002 0 01-18 0v-2.101A1 1 0 014 2zm1 14a1 1 0 011-1h6a1 1 0 011 1v3a1 1 0 01-1 1H6a1 1 0 01-1-1v-3z" clip-rule="evenodd"></path></svg>
+                </a>
+                <a href="#" class="p-2 rounded-xl text-dark-text-secondary hover:bg-dark-hover hover:text-vibrant-green transition duration-200" title="Achievements">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0 7 7 0 01-14 0zm7 4a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                </a>
+                <a href="#" class="p-2 rounded-xl text-dark-text-secondary hover:bg-dark-hover hover:text-vibrant-green transition duration-200" title="Settings">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.5 1.5 0 01-2.22 1.054l-1.47-1.12c-1.354-.952-3.076.671-2.005 2.005l1.12 1.47c-.295.4-.465.91-.465 1.455v.02c0 1.25.75 2.152 1.98 2.34c.34.053.64.217.845.454l.738.868a1.5 1.5 0 002.144 0l.738-.868c.205-.237.505-.4.845-.454 1.23-.188 1.98-1.09 1.98-2.34v-.02c0-.545-.17-1.055-.465-1.455l-1.12-1.47c1.07-.463 2.597-.107 2.98.0a1.5 1.5 0 011.054 2.22l-1.12 1.47c.4.295.91.465 1.455.465h.02c1.25 0 2.152-.75 2.34-1.98.053-.34.217-.64.454-.845l.868-.738a1.5 1.5 0 000-2.144l-.868-.738a1.5 1.5 0 00-.454-.845C17.25 4.75 16.34 4 15.09 4v-.02c-.545 0-1.055-.17-1.455-.465L13 2.455a1.5 1.5 0 00-2.22-1.054zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                </a>
+            </nav>
+            <div class="mt-auto">
+                <button id="profile-initials-btn" class="w-10 h-10 rounded-full bg-teal-accent/50 text-dark-text-primary flex items-center justify-center font-bold text-sm hover:ring-2 ring-teal-accent transition" aria-label="User Profile Menu">
+                    SK
+                </button>
+            </div>
+        </aside>
+
+        <div class="flex-1 p-6 lg:p-10 space-y-10">
+            
+            <header class="flex flex-col sm:flex-row justify-between items-center bg-dark-primary py-4">
+                <div class="flex items-center w-full sm:w-auto mb-4 sm:mb-0">
+                    <p id="user-greeting" class="text-lg font-bold text-dark-text-primary mr-4">Good evening, SARAH</p>
+                    <button id="mobile-menu-toggle" class="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-accent">
+                        <svg class="w-6 h-6 text-dark-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+                
+                <div class="relative w-full sm:max-w-xs md:max-w-md">
+                    <input type="text" placeholder="Search" class="w-full pl-10 pr-4 py-2 rounded-xl bg-dark-card border border-dark-border text-dark-text-primary placeholder-dark-text-secondary focus:ring-teal-accent focus:border-teal-accent text-sm">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </header>
+
+            <div id="mobile-menu-overlay" class="fixed inset-0 bg-dark-primary/95 z-40 hidden md:hidden">
+                <div class="flex justify-end p-4">
+                    <button id="close-mobile-menu" class="text-dark-text-primary">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <nav class="flex flex-col items-center space-y-8 mt-10">
+                    <a href="#" class="text-3xl font-bold text-vibrant-green">Dashboard</a>
+                    <a href="#" class="text-3xl text-dark-text-secondary hover:text-vibrant-green">Challenges</a>
+                    <a href="#" class="text-3xl text-dark-text-secondary hover:text-vibrant-green">Achievements</a>
+                    <a href="avatars.html" 
+   class="p-2 rounded-xl text-dark-text-secondary hover:bg-dark-hover hover:text-vibrant-green transition duration-200" 
+   title="Settings">
+    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.5 1.5 0 01-2.22 1.054l-1.47-1.12c-1.354-.952-3.076.671-2.005 2.005l1.12 1.47c-.295.4-.465.91-.465 1.455v.02c0 1.25.75 2.152 1.98 2.34c.34.053.64.217.845.454l.738.868a1.5 1.5 0 002.144 0l.738-.868c.205-.237.505-.4.845-.454 1.23-.188 1.98-1.09 1.98-2.34v-.02c0-.545-.17-1.055-.465-1.455l-1.12-1.47c1.07-.463 2.597-.107 2.98.0a1.5 1.5 0 011.054 2.22l-1.12 1.47c.4.295.91.465 1.455.465h.02c1.25 0 2.152-.75 2.34-1.98.053-.34.217-.64.454-.845l.868-.738a1.5 1.5 0 000-2.144l-.868-.738a1.5 1.5 0 00-.454-.845C17.25 4.75 16.34 4 15.09 4v-.02c-.545 0-1.055-.17-1.455-.465L13 2.455a1.5 1.5 0 00-2.22-1.054zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
+    </svg>
+</a>
+
+                </nav>
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                
+                <div class="md:col-span-3 lg:col-span-3 bg-dark-card p-6 rounded-3xl challenge-glow-dark relative overflow-hidden space-y-6" id="challenge-hero-1">
+                    
+                    <div class="bg-dark-bg-primary p-6 rounded-2xl relative overflow-hidden border border-vibrant-green/50">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-10" style="background-image: url('https://images.unsplash.com/photo-1545389336-cf91a8ffbd2a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTMzNXwwfDF8c2VhcmNofDh8fHlvZ2ElMjBwb3NlfGVufDB8fHx8MTcwMDQxNjczMHww&ixlib=rb-4.0.3&q=80&w=1080');"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-center space-x-2 text-sm text-dark-text-secondary mb-3">
+                                <span class="px-3 py-1 bg-vibrant-green/20 text-vibrant-green rounded-lg flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Active Challenge
+                                </span>
+                                <span>Beginner</span>
+                            </div>
+                            <h2 class="text-2xl font-extrabold text-light-100">1. Introduction to Yoga & Its Benefits</h2>
+                            <p class="text-dark-text-secondary text-sm mt-1 max-w-md">
+                                Start your journey by learning the history, philosophy, and proven positive effects of regular practice.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="challenge-list-container" class="space-y-4">
+                        <h3 class="text-lg font-bold text-light-100 border-b border-dark-border pb-2">Your Current Progress (3 Steps)</h3>
+
+                        <div id="step-1-sub" class="flex items-start p-4 rounded-xl bg-dark-bg-primary border border-teal-accent/80 transition duration-300 shadow-lg">
+                            <div class="w-6 h-6 rounded-full cta-gradient text-white flex items-center justify-center font-bold text-sm flex-shrink-0 mr-3 mt-1">1</div>
+                            <div class="flex-1">
+                                <p class="text-base font-semibold text-light-100">Watch: "Foundational Philosophy "</p>
+                                <p class="text-xs text-dark-text-secondary">Video: 15 minutes. Learn about the its origin and history.</p>
+                            <div id="step-1-sub" class="flex items-start p-4 rounded-xl bg-dark-bg-primary border border-teal-accent/80 transition duration-300 shadow-lg">
+    <div class="w-6 h-6 rounded-full cta-gradient text-white flex items-center justify-center font-bold text-sm flex-shrink-0 mr-3 mt-1">1</div>
+    
+    <div class="flex-1">
+        <p class="text-base font-semibold text-light-100">Watch: "Foundational Philosophy "</p>
+        <p class="text-xs text-dark-text-secondary">Video: 15 minutes. Learn about its origin and history.</p>
+    </div>
+
+    <!-- UPDATED BUTTON: Now Redirects to Challenges Page -->
+    <button 
+        id="start-step-1-sub" 
+        onclick="location.href='challenges.html'" 
+        class="px-4 py-1 text-sm font-bold rounded-full cta-gradient text-white shadow-md hover:shadow-lg transition duration-200 ml-4">
+        Ready?
+    </button>
+</div>
+                                <p class="text-base font-semibold text-dark-text-secondary">Read: "Benefits of Daily Practice"</p>
+                                <p class="text-xs text-dark-text-secondary">Article: Summarizes the physical and mental health benefits.</p>
+                            </div>
+                            <span class="px-4 py-1 text-sm font-semibold rounded-full bg-dark-border text-dark-text-secondary ml-4">
+                                Locked
+                            </span>
+                        </div>
+
+                        <div id="step-3-sub" class="flex items-start p-4 rounded-xl bg-dark-bg-primary border border-dark-border opacity-50 cursor-not-allowed">
+                            <div class="w-6 h-6 rounded-full bg-dark-border text-dark-text-secondary flex items-center justify-center font-bold text-sm flex-shrink-0 mr-3 mt-1">&#128274;</div>
+                            <div class="flex-1">
+                                <p class="text-base font-semibold text-dark-text-secondary">Quiz: Validate Understanding</p>
+                                <p class="text-xs text-dark-text-secondary">Complete the 5-question quiz to finish Challenge 1.</p>
+                            </div>
+                            <span class="px-4 py-1 text-sm font-semibold rounded-full bg-dark-border text-dark-text-secondary ml-4">
+                                Locked
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-3 lg:col-span-2 bg-dark-card p-6 rounded-3xl space-y-4">
+                    <h3 class="font-bold text-dark-text-primary text-lg mb-4">Top Practitioners</h3>
+                    <ul id="top-practitioners-list" class="space-y-3">
+                        </ul>
+                </div>
+
+                <div class="md:col-span-3 bg-dark-card p-8 rounded-3xl">
+                    <h3 class="text-xl font-bold text-dark-text-primary mb-6 flex items-center justify-between">
+                        Next Challenges
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        
+                        <div class="bg-dark-bg-primary rounded-xl p-4 space-y-3 border border-dark-border opacity-50 cursor-not-allowed">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-2xl text-dark-text-secondary">&#x1f512;</span>
+                                <p class="font-semibold text-light-100">2. Yoga Exercises (Hatha Yoga)</p>
+                            </div>
+                            <p class="text-dark-text-secondary text-sm">
+                                Learn Mountain, Downward Dog, Plank, Boat, and Sun Salutations.
+                            </p>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-vibrant-green font-bold">100 XP</span>
+                                <span class="text-dark-text-secondary bg-dark-border px-3 py-1 rounded-full">Locked</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-dark-bg-primary rounded-xl p-4 space-y-3 border border-dark-border opacity-50 cursor-not-allowed">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-2xl text-dark-text-secondary">&#x1f512;</span>
+                                <p class="font-semibold text-light-100">3. Perform Yoga Exercises</p>
+                            </div>
+                            <p class="text-dark-text-secondary text-sm">
+                                Complete the guided "Initiate Flow" to unlock your next badge and challenge series.
+                            </p>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-vibrant-green font-bold">150 XP</span>
+                                <span class="text-dark-text-secondary bg-dark-border px-3 py-1 rounded-full">Locked</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-dark-bg-primary rounded-xl p-4 space-y-3 border border-dark-border opacity-30 cursor-not-allowed hidden lg:block">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-2xl text-dark-text-secondary">&#128274;</span>
+                                <p class="font-semibold text-light-100">Next Series: Mindful Breathing</p>
+                            </div>
+                            <p class="text-dark-text-secondary text-sm">
+                                Advance your practice by focusing on Pranayama techniques. (Locked)
+                            </p>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-vibrant-green font-bold">TBD</span>
+                                <span class="text-dark-text-secondary bg-dark-border px-3 py-1 rounded-full">Locked</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="md:col-span-2 bg-dark-card p-8 rounded-3xl">
+                    <h3 class="text-xl font-bold text-dark-text-primary mb-6">Your Progress</h3>
+                    <div class="flex flex-col items-center justify-center space-y-6">
+                        <div class="relative w-36 h-36">
+                            <svg class="w-full h-full" viewBox="0 0 100 100">
+                                <circle class="text-dark-border" stroke-width="10" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50"></circle>
+                                <circle id="progress-circle" class="progress-ring__circle text-vibrant-green" stroke-width="10" stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50"></circle>
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span class="text-xs text-dark-text-secondary">Progress</span>
+                                <span id="progress-percent" class="text-3xl font-bold text-light-100">0%</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 w-full max-w-sm">
+                            <div class="bg-dark-bg-primary p-3 rounded-lg flex flex-col items-center justify-center border border-dark-border">
+                                <span class="text-2xl mb-1">&#128170;</span>
+                                <span class="text-sm font-semibold text-light-100">0 Flow</span>
+                            </div>
+                            <div class="bg-dark-bg-primary p-3 rounded-lg flex flex-col items-center justify-center border border-dark-border">
+                                <span class="text-2xl mb-1">&#127769;</span>
+                                <span class="text-sm font-semibold text-light-100">0 Med</span>
+                            </div>
+                            <div class="bg-dark-bg-primary p-3 rounded-lg flex flex-col items-center justify-center border border-dark-border">
+                                <span class="text-2xl mb-1">&#127793;</span>
+                                <span class="text-sm font-semibold text-light-100">0 Cert</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-3 lg:col-span-5 bg-dark-card p-8 rounded-3xl">
+                    <h3 class="text-xl font-bold text-dark-text-primary mb-6">Recent Activities</h3>
+                    <ul id="recent-activities-list" class="space-y-4">
+                        <li class="flex items-center justify-between bg-dark-bg-primary p-4 rounded-xl border border-dark-border">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-teal-accent/20">
+                                    <svg class="w-6 h-6 text-teal-accent" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0 7 7 0 01-14 0zm7 4a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-light-100">Started **Introduction to Yoga** Challenge</p>
+                                    <p class="text-dark-text-secondary text-sm">Current Focus</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-dark-text-secondary text-sm">Just now</span>
+                                <button class="text-dark-text-secondary hover:text-vibrant-green transition">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+            
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- GLOBAL USER & CONFIG VARIABLES ---
+            const currentUserName = "Sarah Kim";
+            const userCurrentXP = 150; // Initial XP for Sarah K.
+            const currentUserInitials = currentUserName.split(' ').map(n => n[0]).join(''); 
+            const firstName = currentUserName.split(' ')[0].toUpperCase();
+            
+            // --- 1. INITIAL UI UPDATES ---
+            
+            // Update Profile Initials (Sidebar)
+            const profileInitialsButton = document.getElementById('profile-initials-btn');
+            if (profileInitialsButton) {
+                profileInitialsButton.textContent = currentUserInitials;
+            }
+            
+            // Update User Greeting
+            const userGreetingElement = document.getElementById('user-greeting');
+            if (userGreetingElement) {
+                const now = new Date();
+                const hours = now.getHours();
+                let greeting = "Good morning";
+                if (hours >= 12 && hours < 17) {
+                    greeting = "Good afternoon";
+                } else if (hours >= 17 || hours < 5) {
+                    greeting = "Good evening";
+                }
+                userGreetingElement.textContent = `${greeting}, ${firstName}`;
+            }
+
+            // --- 2. DYNAMIC LEADERBOARD LOGIC ---
+            
+            const topPractitionersList = document.getElementById('top-practitioners-list');
+
+            function generateLeaderboardHTML(users) {
+                return users.map(user => `
+                    <li class="flex items-center justify-between ${user.name === currentUserName ? 'bg-teal-accent/10 border-l-4 border-teal-accent px-2 py-1 -mx-2 rounded-lg' : ''}">
+                        <div class="flex items-center space-x-3">
+                            <img src="${user.avatar}" alt="Avatar" class="w-10 h-10 rounded-full ${user.name === currentUserName ? 'ring-2 ring-teal-accent' : ''}">
+                            <span class="font-semibold text-light-100">${user.name}${user.name === currentUserName ? ' (You)' : ''}</span>
+                        </div>
+                        <span class="text-vibrant-green text-sm">${user.xp} XP</span>
+                    </li>
+                `).join('');
+            }
+
+            function updateLeaderboard(currentXP) {
+                // Simulated Leaderboard Data (MOCKED API RESPONSE)
+                let leaderboardData = [
+                    { name: "Master Yogi", xp: 5120, avatar: "https://api.lorem.space/image/face?w=40&h=40&hash=846BIR0E" },
+                    { name: "Mike L.", xp: 3500, avatar: "https://api.lorem.space/image/face?w=40&h=40&hash=846BIR0C" },
+                    { name: "Emily R.", xp: 2100, avatar: "https://api.lorem.space/image/face?w=40&h=40&hash=846BIR0B" },
+                    { name: "David G.", xp: 1950, avatar: "https://api.lorem.space/image/face?w=40&h=40&hash=846BIR0A" },
+                    { name: "Javier M.", xp: 1500, avatar: "https://api.lorem.space/image/face?w=40&h=40&hash=846BIR0F" },
+                    // The current user data, dynamically injected
+                    { name: currentUserName, xp: currentXP, avatar: "https://api.lorem.space/image/face?w=40&h=40&hash=846BIR0D" } 
+                ];
+
+                // Sort the data by XP descending
+                leaderboardData.sort((a, b) => b.xp - a.xp);
+
+                // Get the top 5 (or less)
+                const topFive = leaderboardData.slice(0, 5);
+
+                // Check if the current user is in the top 5, if not, add them to the 5th spot if they have higher XP than the 5th person, or add them as a separate entry if they are near the top. For simplicity, we just take the top 5 for display.
+
+                topPractitionersList.innerHTML = generateLeaderboardHTML(topFive);
+            }
+            
+            // Initial leaderboard load
+            updateLeaderboard(userCurrentXP);
+
+
+            // --- 3. MOBILE MENU LOGIC (Remains the same) ---
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+            const closeMobileMenu = document.getElementById('close-mobile-menu');
+            
+            const toggleMobileMenu = () => {
+                const isHidden = mobileMenuOverlay.classList.contains('hidden');
+                if (isHidden) {
+                    mobileMenuOverlay.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden'; 
+                } else {
+                    mobileMenuOverlay.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+            };
+            
+            mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+            closeMobileMenu.addEventListener('click', toggleMobileMenu);
+
+            // --- 4. PROGRESS FEATURE & CHALLENGE LOGIC ---
+            
+            const progressCircle = document.getElementById('progress-circle');
+            const progressPercent = document.getElementById('progress-percent');
+            const circumference = 251.2; 
+            
+            const setProgress = (percent) => {
+                const offset = circumference * (1 - percent / 100);
+                progressCircle.style.strokeDashoffset = offset;
+                progressPercent.textContent = `${percent}%`;
+            };
+
+            setProgress(0); // Initial state
+
+            const startStep1Sub = document.getElementById('start-step-1-sub');
+            const step1Sub = document.getElementById('step-1-sub');
+            const step2Sub = document.getElementById('step-2-sub');
+            const step3Sub = document.getElementById('step-3-sub');
+            const recentActivitiesList = document.getElementById('recent-activities-list');
+            
+            let stepsCompletedCount = 0; // State tracking for progress
+
+            const completeStep = (stepElement, stepNumber) => {
+                
+                // Check if already completed
+                if (stepElement.classList.contains('opacity-70') && stepElement.querySelector('.bg-vibrant-green')) return;
+
+                // 1. Update Step Visuals (Done)
+                stepElement.classList.remove('border-teal-accent/80', 'shadow-lg', 'opacity-100');
+                stepElement.classList.add('border-vibrant-green/50', 'opacity-70');
+                
+                // Change number to checkmark
+                const numberIcon = stepElement.querySelector('.w-6.h-6');
+                if (numberIcon) {
+                    numberIcon.classList.remove('cta-gradient', 'text-white', 'bg-dark-border', 'text-dark-text-secondary');
+                    numberIcon.classList.add('bg-vibrant-green');
+                    numberIcon.innerHTML = `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>`;
+                }
+                
+                // Remove the start button/lock and replace with 'Done'
+                const actionElement = stepElement.querySelector('button, span:last-child');
+                if (actionElement) {
+                    actionElement.outerHTML = `<span class="px-4 py-1 text-sm font-semibold rounded-full bg-vibrant-green/20 text-vibrant-green ml-4">Done</span>`;
+                }
+
+                // 2. Update overall progress & XP (simulated)
+                stepsCompletedCount++;
+                const totalSteps = 3;
+                const newProgress = Math.floor((stepsCompletedCount / totalSteps) * 100);
+                setProgress(newProgress);
+                
+                // Simulate XP gain and update leaderboard after a short delay
+                const xpGain = stepNumber * 50; 
+                setTimeout(() => {
+                    const newXP = userCurrentXP + xpGain;
+                    updateLeaderboard(newXP); // Update leaderboard with new XP
+                }, 500);
+                
+                // 3. Unlock Next Step
+                if (stepNumber === 1) unlockStep(step2Sub, 2, "Read");
+                if (stepNumber === 2) unlockStep(step3Sub, 3, "Start");
+                
+                // 4. Add to recent activities
+                addActivity(`Completed Step ${stepNumber} (+${xpGain} XP)`, stepElement.querySelector('p:nth-child(1)').textContent);
+
+                // 5. Final Challenge Completion
+                if (stepsCompletedCount === totalSteps) {
+                    // Update Hero Banner and show completion message
+                    document.querySelector('.relative.z-10 h2').textContent = "Challenge 1 Complete!";
+                    document.querySelector('.relative.z-10 p').textContent = "Fantastic work! Proceed to the Next Challenges section to unlock your Hatha Poses.";
+                    // Unlock Challenge 2 (Simulated)
+                    document.querySelector('.md\\:col-span-3 .grid div:first-child').classList.remove('opacity-50', 'cursor-not-allowed');
+                    document.querySelector('.md\\:col-span-3 .grid div:first-child .text-2xl').innerHTML = '&#128170;';
+                    document.querySelector('.md\\:col-span-3 .grid div:first-child .text-sm:last-child').textContent = 'Unlocked';
+                }
+            };
+
+            const unlockStep = (stepElement, stepNumber, actionText) => {
+                stepElement.classList.remove('opacity-50', 'cursor-not-allowed', 'border-dark-border');
+                stepElement.classList.add('border-teal-accent/80', 'shadow-lg', 'cursor-pointer');
+                
+                const lockIcon = stepElement.querySelector('.w-6.h-6');
+                if (lockIcon) {
+                    lockIcon.classList.remove('bg-dark-border', 'text-dark-text-secondary');
+                    lockIcon.classList.add('cta-gradient', 'text-white');
+                    lockIcon.textContent = stepNumber;
+                }
+                
+                const lockSpan = stepElement.querySelector('span:last-child');
+                if (lockSpan) {
+                    lockSpan.outerHTML = `<button id="start-step-${stepNumber}-sub" class="px-4 py-1 text-sm font-bold rounded-full cta-gradient text-white shadow-md hover:shadow-lg transition duration-200 ml-4">${actionText}</button>`;
+                }
+
+                // Re-attach click listener for the newly unlocked button (must be done AFTER updating HTML)
+                if (stepNumber === 2) {
+                    document.getElementById('start-step-2-sub').addEventListener('click', () => completeStep(step2Sub, 2));
+                }
+                if (stepNumber === 3) {
+                    document.getElementById('start-step-3-sub').addEventListener('click', () => completeStep(step3Sub, 3));
+                }
+            };
+            
+            const addActivity = (xpStatus, stepName) => {
+                 const newActivity = document.createElement('li');
+                 newActivity.classList.add('flex', 'items-center', 'justify-between', 'bg-dark-bg-primary', 'p-4', 'rounded-xl', 'border', 'border-dark-border');
+                 newActivity.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-vibrant-green/20">
+                            <svg class="w-6 h-6 text-vibrant-green" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0 7 7 0 01-14 0zm7 4a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-light-100">${stepName}</p>
+                            <p class="text-dark-text-secondary text-sm">Challenge 1 Progress | ${xpStatus}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-dark-text-secondary text-sm">Just now</span>
+                        <button class="text-dark-text-secondary hover:text-vibrant-green transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                 `;
+                 // Insert new activity at the top
+                 recentActivitiesList.prepend(newActivity);
+            }
+
+            // Add click listeners to the steps
+            if (startStep1Sub) {
+                startStep1Sub.addEventListener('click', () => completeStep(step1Sub, 1));
+            }
+        });
+    </script>
+</body>
+</html>

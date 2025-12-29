@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoga Challenge Tracker</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font - not strictly needed as Tailwind defaults often use system fonts, but good practice -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* Custom font and basic styling */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* Custom transition for button to feel snappier */
+        .challenge-button {
+            transition: all 0.3s ease-in-out;
+            transform: translateY(0);
+        }
+        .challenge-button:hover:not(.cursor-not-allowed) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(76, 81, 191, 0.4);
+        }
+        /* Responsive video embed container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 0.75rem; /* rounded-xl */
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#4c51bf', // Indigo/Violet for main actions
+                        'secondary-green': '#059669', // Strong Green for Completed
+                        'danger-red': '#dc2626',
+                        'yoga-gold': '#f59e0b', // Yellow/Gold for In Progress
+                        'locked-gray': '#9ca3af',
+                    }
+                }
+            }
+        }
+
+        // --- CHALLENGE 2 CONTENT: EDITABLE DATA BLOCK ---
+        // This constant contains all the dynamic content for the "Mastering Hatha Asanas" challenge.
+        // Developers can modify the URL, titles, reading text, and quiz here.
+        const CHALLENGE_2_CONTENT = {
+            "Video (Pose Demonstrations)": {
+                type: "video",
+                // IMPORTANT: Replace the YouTube embed URL below to update the video lesson
+                url: "https://www.youtube.com/embed/g7Qh6J9t8Jk", 
+                title: "The Core Six: Mountain, Dog, Tree, Plank, Cobra, and Savasana",
+                description: "Watch this video to see demonstrations of the six foundational Hatha poses. Focus on alignment, transitions, and breath coordination. Pay special attention to engaging your core in Plank and broadening your chest in Cobra."
+            },
+            "Reading (Step-by-Step Instructions)": {
+                type: "reading",
+                title: "Deep Dive: Downward-Facing Dog (Adho Mukha Svanasana)",
+                // IMPORTANT: Edit the detailed pose instructions below
+                text: "Downward-Facing Dog is arguably the most recognizable yoga pose. It's an inversion, a mild backbend, and a deep stretch all in one. \n\n**Instructions:** \n1. Start on your hands and knees (tabletop). \n2. Spread your fingers wide, index fingers pointing forward. \n3. Tuck your toes and lift your hips up and back, forming an inverted 'V' shape. \n4. Press actively through your hands, drawing your shoulder blades down your back. \n5. Keep a slight bend in your knees if your hamstrings are tight, and lengthen your spine. \n6. Draw your heels toward the floor (they don't need to touch). \n7. Hold for 5-10 deep breaths, gazing softly toward your navel or thighs."
+            },
+            "Validation Quiz (Pose Names & Form)": {
+                type: "quiz",
+                title: "Core Asana Terminology",
+                // IMPORTANT: Update the quiz question, options, and correct answer
+                question: "In Tree Pose (Vrksasana), which action is crucial for maintaining balance?",
+                options: ["Locking the standing knee straight", "Placing the foot on the kneecap", "Pressing the foot into the inner thigh and resisting with the thigh", "Tilting the hips dramatically"],
+                answer: "Pressing the foot into the inner thigh and resisting with the thigh"
+            }
+        };
+        // --- END OF CHALLENGE 2 CONTENT ---
+
+        // --- CHALLENGE 3 CONTENT: EDITABLE DATA BLOCK ---
+        // This constant contains all the dynamic content for the "7-Day Performance Challenge".
+        // Developers can modify the criteria, logging requirements, and final assessment here.
+        const CHALLENGE_3_CONTENT = {
+            "Log Day 1-3 Practice": {
+                type: "reading", // Using 'reading' type to display logging criteria
+                title: "Practice Logging Criteria: Days 1-3",
+                // IMPORTANT: Edit the detailed practice criteria below
+                text: "For the first three days, your goal is simple: **Consistency and Form Focus**.\n\n**Criteria:**\n1. Complete a minimum 20-minute flow session daily.\n2. Hold each Hatha pose (Challenge 2 poses) for at least 5 breaths.\n3. Take a brief note (in your personal journal) on the most challenging pose and why.\n\n*Click 'Mark as Complete' once you've finished the first three days of continuous practice.*",
+            },
+            "Log Day 4-7 Practice": {
+                type: "reading", // Using 'reading' type to display logging criteria
+                title: "Practice Logging Criteria: Days 4-7",
+                // IMPORTANT: Edit the detailed practice criteria below
+                text: "For the final four days, the focus shifts to **Endurance and Mindfulness**.\n\n**Criteria:**\n1. Extend your daily flow session to a minimum of 30 minutes.\n2. Incorporate 5 minutes of focused Pranayama (breathing) before or after the flow.\n3. Note any physical or mental changes you observe during this period.\n\n*Click 'Mark as Complete' once you've finished the full 7-day challenge.*",
+            },
+            "Final Reflection/Assessment": {
+                type: "quiz",
+                title: "Performance Reflection Quiz",
+                // IMPORTANT: Update the assessment question, options, and correct answer
+                question: "After completing the 7-day challenge, which mental state best describes the primary benefit you gained (assuming successful practice)?",
+                options: ["Increased restlessness", "Improved focus and calm", "Increased muscle soreness only", "No significant change"],
+                answer: "Improved focus and calm"
+            }
+        };
+        // --- END OF CHALLENGE 3 CONTENT ---
+
+
+        // --- Challenge Data and State Management ---
+        let activeChallengeId = null; // New state variable to track the currently viewed challenge page
+
+        let challenges = [
+            {
+                id: 1,
+                title: "Introduction to Yoga & Benefits",
+                description: "Deep dive into the history, core philosophy, and documented physical/mental benefits of Yoga practice.",
+                category: "Foundational Learning",
+                status: "Not Started", 
+                icon: "📜",
+                substeps: [
+                    { name: "Video Presentation (Intro & History)", icon: "🎬", isComplete: false, type: "Video" }, 
+                    { name: "Reading (Benefits & Philosophy)", icon: "📖", isComplete: false, type: "Reading" },
+                    { name: "Validation Quiz (History & Terms)", icon: "📝", isComplete: false, type: "Quiz" },
+                ],
+                // Detailed content for the challenge page
+                content: {
+                    "Video Presentation (Intro & History)": {
+                        type: "video",
+                        url: "https://www.youtube.com/embed/RkG9zL2tLDE", // Placeholder YouTube embed for Yoga Intro
+                        title: "The Origins of Yoga and Its Modern Practice",
+                        description: "Watch this introductory video to understand the rich history of yoga, its journey from ancient India to the modern world, and the difference between various styles."
+                    },
+                    "Reading (Benefits & Philosophy)": {
+                        type: "reading",
+                        title: "The Holistic Benefits of Consistent Practice",
+                        text: "Yoga, originating in ancient India, is more than just physical exercise; it's a spiritual and philosophical discipline aimed at uniting the mind, body, and spirit. The four main paths are Karma Yoga, Bhakti Yoga, Raja Yoga (which includes Hatha Yoga), and Jnana Yoga. Regular practice offers physical benefits like improved flexibility, muscle tone, and respiration, and mental benefits such as stress reduction, improved focus, and mental clarity. This holistic approach forms the foundation of modern practice."
+                    },
+                    "Validation Quiz (History & Terms)": {
+                        type: "quiz",
+                        title: "Quick Knowledge Check",
+                        question: "In traditional yoga philosophy, what concept refers to 'right breathing techniques'?",
+                        options: ["Asana (Pose)", "Dharana (Concentration)", "Pranayama (Breath)", "Yama (Moral Code)"],
+                        answer: "Pranayama (Breath)"
+                    }
+                }
+            },
+            {
+                id: 2,
+                title: "Mastering Hatha Asanas",
+                description: "Practice and perfect the form for Mountain, Downward Dog, Tree, Plank, Boat Pose, and the Sun Salutation sequence.",
+                category: "Practical Application",
+                status: "Locked", 
+                icon: "🧘‍♀️",
+                substeps: [
+                    { name: "Video (Pose Demonstrations)", icon: "🎬", isComplete: false, type: "Video" },
+                    { name: "Reading (Step-by-Step Instructions)", icon: "📖", isComplete: false, type: "Reading" },
+                    { name: "Validation Quiz (Pose Names & Form)", icon: "📝", isComplete: false, type: "Quiz" },
+                ],
+                // Content now references the separate data block defined above
+                content: CHALLENGE_2_CONTENT
+            },
+            {
+                id: 3,
+                title: "7-Day Performance Challenge",
+                description: "Perform the full sequence of learned Yoga exercises every day for one week to build consistency and track physical changes.",
+                category: "Consistency & Performance",
+                status: "Locked", 
+                icon: "✅",
+                substeps: [
+                    { name: "Log Day 1-3 Practice", icon: "📅", isComplete: false, type: "Practice Log" },
+                    { name: "Log Day 4-7 Practice", icon: "📅", isComplete: false, type: "Practice Log" },
+                    { name: "Final Reflection/Assessment", icon: "🏆", isComplete: false, type: "Quiz" },
+                ],
+                // Content now references the separate data block defined above
+                content: CHALLENGE_3_CONTENT
+            },
+        ];
+
+        // --- Utility Functions ---
+
+        function calculateProgress(substeps) {
+            if (!substeps || substeps.length === 0) return 0;
+            const completedCount = substeps.filter(s => s.isComplete).length;
+            return Math.floor((completedCount / substeps.length) * 100);
+        }
+
+        function getChallengeById(id) {
+            return challenges.find(c => c.id === id);
+        }
+        
+        function getStatusClasses(status) {
+            switch(status) {
+                case 'In Progress':
+                    return 'bg-yoga-gold text-gray-800';
+                case 'Completed':
+                    return 'bg-secondary-green text-white font-semibold';
+                case 'Not Started':
+                    return 'bg-gray-100 text-gray-800';
+                case 'Locked':
+                    return 'bg-locked-gray text-white font-semibold';
+                default:
+                    return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function getButtonClasses(status) {
+            switch(status) {
+                case 'In Progress':
+                    return 'bg-primary-blue hover:bg-violet-700';
+                case 'Completed':
+                    return 'bg-secondary-green cursor-default';
+                case 'Not Started':
+                    return 'bg-secondary-green hover:bg-green-700';
+                case 'Locked':
+                    return 'bg-locked-gray cursor-not-allowed';
+                default:
+                    return 'bg-gray-400 cursor-not-allowed';
+            }
+        }
+
+        function getButtonText(status) {
+             switch(status) {
+                case 'Completed':
+                    return 'Completed!';
+                case 'Not Started':
+                    return 'Start Challenge';
+                case 'Locked':
+                    return 'Locked (Complete Previous)';
+                default:
+                    return 'Action';
+            }
+        }
+
+        // --- Core Logic Functions ---
+
+        /**
+         * Handles the main action button click from the grid view.
+         */
+        function handleChallengeAction(challengeId) {
+            let challenge = getChallengeById(challengeId);
+            if (!challenge) return;
+
+            if (challenge.status === 'Locked' || challenge.status === 'Completed') {
+                showMessage(`Challenge ${challengeId} is ${challenge.status}.`);
+                return;
+            }
+
+            // Navigate to the detail page for "Not Started" or "In Progress" challenges
+            activeChallengeId = challengeId;
+            renderApp(); 
+        }
+
+        /**
+         * Marks the current incomplete step as complete and updates progress.
+         */
+        function handleStepComplete(challengeId) {
+            let challenge = getChallengeById(challengeId);
+            if (!challenge || challenge.status === 'Completed') return;
+
+             // 1. If 'Not Started', transition to 'In Progress'
+            if (challenge.status === 'Not Started') {
+                challenge.status = 'In Progress';
+            }
+
+            // 2. Find the first incomplete substep and mark it complete
+            const incompleteIndex = challenge.substeps.findIndex(s => !s.isComplete);
+            
+            if (incompleteIndex !== -1) {
+                const completedStepName = challenge.substeps[incompleteIndex].name;
+                challenge.substeps[incompleteIndex].isComplete = true;
+                showMessage(`Step completed: "${completedStepName}". Progress updated!`);
+            } 
+
+            // 3. Recalculate progress and check for completion
+            const newProgress = calculateProgress(challenge.substeps);
+            if (newProgress === 100) {
+                challenge.status = 'Completed';
+                showMessage(`Challenge ${challenge.id} is officially Completed! Amazing work! ✨`);
+                
+                // Unlock the next challenge (simple linear progression)
+                const nextChallenge = getChallengeById(challengeId + 1);
+                if (nextChallenge && nextChallenge.status === 'Locked') {
+                    nextChallenge.status = 'Not Started';
+                    showMessage(`Challenge ${nextChallenge.id} is now Unlocked!`);
+                }
+                
+                // Navigate back to the grid after completion
+                handleBackToGrid();
+            }
+
+            // Re-render the challenge page content
+            renderApp();
+        }
+
+        function handleBackToGrid() {
+            activeChallengeId = null;
+            renderApp();
+        }
+
+        function showMessage(message) {
+            const messageBox = document.getElementById('message-box');
+            messageBox.textContent = message;
+            // Ensure classes are set correctly for transition start
+            messageBox.classList.remove('hidden', 'opacity-0', 'translate-y-4');
+            messageBox.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                // Start fade-out transition
+                messageBox.classList.remove('opacity-100', 'translate-y-0');
+                messageBox.classList.add('opacity-0', 'translate-y-4');
+                // Hide after transition ends
+                setTimeout(() => messageBox.classList.add('hidden'), 500); 
+            }, 3000);
+        }
+
+        // --- Rendering Functions ---
+        
+        /**
+         * Renders the main challenge grid view.
+         */
+        function renderChallengeGrid() {
+            const container = document.getElementById('app-container');
+            if (!container) return;
+
+            // Stats Update
+            const activeCount = challenges.filter(c => c.status === 'In Progress' || c.status === 'Not Started').length;
+            const completedCount = challenges.filter(c => c.status === 'Completed').length;
+            
+            // Render the full app structure including the grid
+            container.innerHTML = `
+                <!-- Header and Stats (Static) -->
+                <header class="mb-8 border-b pb-4">
+                    <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Yoga Journey: 3-Stage Challenge</h1>
+                    <p class="text-gray-500 text-lg">Master the fundamentals and build a consistent practice.</p>
+                </header>
+        
+                <!-- Stats Overview -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-5 rounded-xl shadow flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Total Stages</p>
+                            <p id="total-stages-stat" class="text-3xl font-bold text-gray-800">${challenges.length}</p>
+                        </div>
+                        <span class="text-3xl text-primary-blue opacity-50">🧘</span>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Stages Active</p>
+                            <p id="active-stages-stat" class="text-3xl font-bold text-yoga-gold">${activeCount}</p>
+                        </div>
+                        <span class="text-3xl text-yoga-gold opacity-50">⏳</span>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Stages Completed</p>
+                            <p id="completed-stages-stat" class="text-3xl font-bold text-secondary-green">${completedCount}</p>
+                        </div>
+                        <span class="text-3xl text-secondary-green opacity-50">✨</span>
+                    </div>
+                </div>
+        
+                <!-- Challenges Grid -->
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Path to Mastery</h2>
+                <div id="challenges-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${challenges.map(challenge => {
+                        const progress = calculateProgress(challenge.substeps);
+                        const statusClasses = getStatusClasses(challenge.status);
+                        const buttonClasses = getButtonClasses(challenge.status);
+                        
+                        const nextStep = challenge.substeps.find(s => !s.isComplete);
+                        let buttonText;
+                        if (challenge.status === 'In Progress' && nextStep) {
+                            buttonText = `Continue: ${nextStep.name}`;
+                        } else {
+                            buttonText = getButtonText(challenge.status);
+                        }
+                        
+                        const progressColor = challenge.status === 'Completed' ? 'bg-secondary-green' : (challenge.status === 'Locked' ? 'bg-locked-gray' : 'bg-primary-blue');
+
+                        return `
+                            <div id="challenge-card-${challenge.id}" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 flex flex-col justify-between ${challenge.status === 'Locked' ? 'opacity-70 grayscale' : ''}">
+                                <div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="text-xl font-bold text-gray-800">${challenge.icon} ${challenge.title}</h3>
+                                        <span class="challenge-status text-xs font-medium px-3 py-1 rounded-full ${statusClasses}">
+                                            ${challenge.status}
+                                        </span>
+                                    </div>
+                                    <p class="text-gray-600 mb-4">${challenge.description}</p>
+                                    <div class="text-sm font-medium text-primary-blue mb-3">${challenge.category}</div>
+                                    
+                                    <!-- Sub-Steps Checklist (Video, Reading, Quiz) -->
+                                    <div class="mb-5 space-y-2">
+                                        <p class="text-sm font-semibold text-gray-700">Sub-Steps Checklist:</p>
+                                        ${challenge.substeps.map(step => `
+                                            <div class="flex items-center text-sm text-gray-600">
+                                                <span class="mr-2 text-lg">${step.icon}</span>
+                                                <span class="mr-3 font-medium ${step.isComplete ? 'line-through text-gray-400' : ''}">${step.name}</span>
+                                                ${step.isComplete 
+                                                    ? `<span class="text-secondary-green">✓</span>` 
+                                                    : `<span class="text-yoga-gold">...</span>`
+                                                }
+                                            </div>
+                                        `).join('')}
+                                    </div>
+
+                                    <!-- Progress Bar -->
+                                    <div class="mb-4">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-sm font-medium text-gray-700">Progress</span>
+                                            <span class="text-sm font-bold text-gray-900">${progress}%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                            <div class="progress-fill h-2.5 rounded-full ${progressColor} transition-all duration-500" style="width: ${progress}%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Button -->
+                                <button onclick="handleChallengeAction(${challenge.id})" class="challenge-button mt-4 text-white py-2 rounded-lg font-semibold transition duration-200 ${buttonClasses} shadow-md hover:shadow-lg">
+                                    ${buttonText}
+                                </button>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        /**
+         * Renders the detailed view for a single challenge.
+         */
+        function renderChallengePage(challengeId) {
+            const container = document.getElementById('app-container');
+            const challenge = getChallengeById(challengeId);
+            if (!container || !challenge) return;
+
+            const progress = calculateProgress(challenge.substeps);
+            const nextStep = challenge.substeps.find(s => !s.isComplete);
+            const currentStepName = nextStep ? nextStep.name : 'Challenge Completed!';
+            const currentStepContent = nextStep ? challenge.content[nextStep.name] : null;
+
+            // Content block rendering based on step type
+            let contentBlock = '';
+            if (currentStepContent) {
+                if (currentStepContent.type === 'video') {
+                    contentBlock = `
+                        <div class="video-container">
+                            <iframe src="${currentStepContent.url}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800 mt-4">${currentStepContent.title}</h4>
+                        <p class="text-gray-700 mt-2">${currentStepContent.description}</p>
+                    `;
+                } else if (currentStepContent.type === 'reading') {
+                    contentBlock = `
+                        <h4 class="text-xl font-semibold text-primary-blue mb-3">${currentStepContent.title}</h4>
+                        <!-- Display reading content, using whitespace-pre-line to respect potential line breaks in text data -->
+                        <p class="text-gray-700 leading-relaxed whitespace-pre-line">${currentStepContent.text}</p>
+                    `;
+                } else if (currentStepContent.type === 'quiz') {
+                    // Simple quiz simulation
+                    contentBlock = `
+                        <h4 class="text-xl font-semibold text-primary-blue mb-4">${currentStepContent.title}</h4>
+                        <p class="text-lg font-medium text-gray-800 mb-3">${currentStepContent.question}</p>
+                        <div class="space-y-2">
+                            ${currentStepContent.options.map((option, index) => `
+                                <div class="flex items-center bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition duration-150">
+                                    <input id="quiz-option-${index}" type="radio" name="quiz-answer" value="${option}" class="text-primary-blue focus:ring-primary-blue">
+                                    <label for="quiz-option-${index}" class="ml-3 text-gray-700 font-medium">${option}</label>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+            } else {
+                contentBlock = `
+                    <div class="bg-secondary-green/10 p-6 rounded-xl text-center border-2 border-secondary-green">
+                        <p class="text-3xl text-secondary-green font-extrabold mb-2">Challenge Complete!</p>
+                        <p class="text-gray-700">All steps are finalized. You have successfully mastered this stage. Click 'Back to Challenges' to proceed!</p>
+                    </div>
+                `;
+            }
+
+
+            container.innerHTML = `
+                <!-- Back Button & Header -->
+                <div class="flex justify-between items-center mb-6 border-b pb-4">
+                    <button onclick="handleBackToGrid()" class="flex items-center text-primary-blue hover:text-violet-700 font-semibold transition duration-200">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        Back to Challenges
+                    </button>
+                    <h1 class="text-3xl font-extrabold text-gray-900">${challenge.icon} ${challenge.title}</h1>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Column 1: Current Step Content -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">${nextStep ? nextStep.icon : '🏆'} ${currentStepName}</h2>
+                        
+                        ${contentBlock}
+
+                        <!-- Action Button to Complete Step (Hidden if completed) -->
+                        <button 
+                            onclick="handleStepComplete(${challenge.id})" 
+                            class="challenge-button mt-6 w-full text-white py-3 rounded-lg font-bold transition duration-200 ${nextStep ? 'bg-secondary-green hover:bg-green-700' : 'bg-gray-400 cursor-default'}"
+                            ${nextStep ? '' : 'disabled'}
+                        >
+                            ${nextStep ? `Mark "${currentStepName}" as Complete` : 'Challenge Complete!'}
+                        </button>
+                    </div>
+
+                    <!-- Column 2: Progress & Checklist Sidebar -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <!-- Progress Card -->
+                        <div class="bg-primary-blue text-white p-5 rounded-xl shadow-lg">
+                            <h3 class="text-xl font-bold mb-3">Your Progress</h3>
+                            <div class="w-full bg-indigo-700 rounded-full h-3">
+                                <div class="h-3 rounded-full bg-white transition-all duration-500" style="width: ${progress}%;"></div>
+                            </div>
+                            <p class="text-3xl font-extrabold mt-3">${progress}%</p>
+                            <p class="text-sm font-medium opacity-75">${challenge.substeps.filter(s => s.isComplete).length} of ${challenge.substeps.length} Steps Completed</p>
+                        </div>
+                        
+                        <!-- Checklist Card -->
+                        <div class="bg-white p-5 rounded-xl shadow-lg">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Challenge Checklist</h3>
+                            <div class="space-y-4">
+                                ${challenge.substeps.map(step => `
+                                    <div class="flex items-center">
+                                        <div class="w-6 h-6 rounded-full flex items-center justify-center mr-3 
+                                            ${step.isComplete ? 'bg-secondary-green text-white' : (step.name === currentStepName ? 'bg-yoga-gold text-white' : 'bg-gray-200 text-gray-600')}"
+                                        >
+                                            ${step.isComplete ? '✓' : step.icon}
+                                        </div>
+                                        <span class="font-medium ${step.isComplete ? 'line-through text-gray-400' : 'text-gray-700'}">
+                                            ${step.name}
+                                        </span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * The main application renderer, decides whether to show grid or detail view.
+         */
+        function renderApp() {
+            if (activeChallengeId !== null) {
+                renderChallengePage(activeChallengeId);
+            } else {
+                renderChallengeGrid();
+            }
+        }
+
+
+        // Render the app when the window loads
+        window.onload = renderApp;
+    </script>
+</head>
+<body>
+
+    <!-- Main Content Area Container -->
+    <div class="min-h-screen p-4 md:p-8 max-w-7xl mx-auto">
+        <div id="app-container">
+            <!-- Content (Grid or Page) will be injected here by JavaScript -->
+        </div>
+
+        <!-- Floating Message Box (Alerts) -->
+        <div id="message-box" class="hidden fixed bottom-5 right-5 z-50 bg-gray-800 text-white px-6 py-3 rounded-xl shadow-2xl transition-all duration-500 ease-in-out opacity-0 translate-y-4">
+            Message
+        </div>
+
+    </div>
+
+</body>
+</html>
