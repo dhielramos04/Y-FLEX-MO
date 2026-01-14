@@ -206,38 +206,68 @@
         // --- 1. Load Learner Name ---
         const learner = localStorage.getItem("learnerName");
         if (learner) {
-            // This updates the "Yoga Learner" text with the actual name
             document.getElementById("learnerDisplay").textContent = learner;
         }
 
-        // --- 2. Your Existing Stage Completion Logic ---
+        // --- 2. STAGE 1 COMPLETION LOGIC ---
         if (localStorage.getItem('challenge1_complete') === 'true') {
-            // Update Scores
+            // Stats Update
             document.getElementById('total-points').innerText = "300";
             document.getElementById('current-xp').innerText = "300";
             document.getElementById('xp-bar').style.width = "60%";
             document.getElementById('badge-count').innerText = "1";
             
-            // Unlock Stage 2
-            const s2 = document.getElementById('challenge-2');
-            s2.classList.remove('locked-state');
-            s2.classList.add('active-card');
-            const btn = s2.querySelector('button');
-            btn.removeAttribute('disabled');
-            btn.className = "w-full bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-lg";
-            btn.innerText = "Start Stage";
+            // Unlock Stage 2 Card
+            unlockStage('challenge-2', 'challenge2_content.html');
 
-            // Show Badge Reward
-            const badgeBox = document.getElementById('badges-container').children[0];
-            badgeBox.classList.remove('opacity-30', 'grayscale');
-            badgeBox.classList.add('badge-unlock');
-            badgeBox.querySelector('div').classList.remove('border-dashed', 'border-gray-300');
-            badgeBox.querySelector('div').classList.add('border-solid', 'border-green-500', 'bg-green-50');
-            badgeBox.querySelector('p').classList.replace('text-gray-400', 'text-green-700');
+            // Unlock Stage 1 Badge (Visual)
+            unlockBadge(0);
+        }
+
+        // --- 3. STAGE 2 COMPLETION LOGIC ---
+        if (localStorage.getItem('challenge2_complete') === 'true') {
+            // Stats Update (Cumulative)
+            document.getElementById('total-points').innerText = "600";
+            document.getElementById('current-xp').innerText = "600";
+            document.getElementById('xp-bar').style.width = "85%";
+            document.getElementById('badge-count').innerText = "2";
+
+            // Unlock Stage 3 Card
+            unlockStage('challenge-3', 'challenge3_content.html');
+
+            // Unlock Stage 2 Badge (Visual)
+            unlockBadge(1);
         }
     };
+
+    // Helper Function to Unlock a Stage
+    function unlockStage(elementId, destinationFile) {
+        const card = document.getElementById(elementId);
+        card.classList.remove('locked-state');
+        card.classList.add('active-card');
+        
+        const btn = card.querySelector('button');
+        btn.removeAttribute('disabled');
+        btn.className = "w-full bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-lg cursor-pointer";
+        btn.innerText = "Start Stage";
+        
+        btn.onclick = function() {
+            window.location.href = destinationFile;
+        };
+    }
+
+    // Helper Function to Colorize a Badge
+    function unlockBadge(index) {
+        const badgeBox = document.getElementById('badges-container').children[index];
+        badgeBox.classList.remove('opacity-30', 'grayscale');
+        badgeBox.classList.add('badge-unlock');
+        badgeBox.querySelector('div').classList.remove('border-dashed', 'border-gray-300');
+        badgeBox.querySelector('div').classList.add('border-solid', 'border-green-500', 'bg-green-50');
+        badgeBox.querySelector('p').classList.replace('text-gray-400', 'text-green-700');
+    }
 </script>
 </body>
 
 </html>
+
 
