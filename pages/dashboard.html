@@ -209,17 +209,17 @@
             document.getElementById("learnerDisplay").textContent = learner;
         }
 
-        // --- 2. GET ALL SAVED DATA ---
-        const s1Points = parseInt(localStorage.getItem('challenge1_points')) || 0;
-        const s2Points = parseInt(localStorage.getItem('challenge2_points')) || 0;
-        const s3Points = parseInt(localStorage.getItem('challenge3_points')) || 0;
-        
-        const s1Complete = localStorage.getItem('challenge1_complete') === 'true';
-        const s2Complete = localStorage.getItem('challenge2_complete') === 'true';
-        const s3Complete = localStorage.getItem('challenge3_complete') === 'true';
+       // --- 2. GET ALL SAVED DATA (SAFE VERSION) ---
+const s1Points = Number(localStorage.getItem('challenge1_points') ?? 0);
+const s2Points = Number(localStorage.getItem('challenge2_points') ?? 0);
+const s3Points = Number(localStorage.getItem('challenge3_points') ?? 0);
 
-        // --- 3. CALCULATE TOTALS ---
-        const totalPoints = s1Points + s2Points + s3Points;
+const s1Complete = localStorage.getItem('challenge1_complete') === 'true';
+const s2Complete = localStorage.getItem('challenge2_complete') === 'true';
+const s3Complete = localStorage.getItem('challenge3_complete') === 'true';
+
+// --- 3. CALCULATE TOTALS ---
+const totalPoints = s1Points + s2Points + s3Points;
 
         // >>> START OF RANK LOGIC INSERTION <<<
         const userLevelText = document.getElementById('user-level');
@@ -330,6 +330,7 @@
 </body>
 
 </html>
+
 
 
 
