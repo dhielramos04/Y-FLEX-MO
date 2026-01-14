@@ -286,21 +286,27 @@ const totalPoints = s1Points + s2Points + s3Points;
     // (Keep your helper functions unlockStage and unlockBadge below)
       // --- HELPER FUNCTIONS ---
 
-    function unlockStage(elementId, destinationFile) {
-        const card = document.getElementById(elementId);
-        if (!card) return;
-        
-        card.classList.remove('locked-state');
-        card.classList.add('active-card');
-        
-        const btn = card.querySelector('button');
-        if (btn) {
-            btn.removeAttribute('disabled');
-            btn.className = "w-full bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-lg cursor-pointer";
-            btn.innerText = "Start Stage";
-            btn.onclick = function() { window.location.href = destinationFile; };
-        }
+  function unlockStage(elementId, destinationFile) {
+    const card = document.getElementById(elementId);
+    if (!card) return;
+
+    card.classList.remove('locked-state');
+    card.classList.add('active-card');
+
+    // Support BOTH <a> and <button>
+    let btn = card.querySelector('button, a');
+    if (!btn) return;
+
+    btn.removeAttribute('disabled');
+    btn.className = "w-full bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-lg cursor-pointer";
+    btn.innerText = "Start Stage";
+    btn.onclick = () => window.location.href = destinationFile;
+
+    // If it was an <a>, neutralize href conflicts
+    if (btn.tagName === "A") {
+        btn.href = "javascript:void(0)";
     }
+}
 
     function unlockBadge(index, score) {
         const container = document.getElementById('badges-container');
@@ -330,6 +336,7 @@ const totalPoints = s1Points + s2Points + s3Points;
 </body>
 
 </html>
+
 
 
 
