@@ -189,32 +189,33 @@
     }
 
    function finishChallenge() {
-    // 1. Calculate weighted points (e.g., 20 points per correct answer)
-    // This ensures the XP bar on the progress page grows correctly
-    const totalPossible = quizData.length;
-    const pointsEarned = (correctCount / totalPossible) * 100; 
+    // 1. Calculate points: if score is 5/5, they get the full 200 points.
+    // If they get 4/5, they get 160 points, etc.
+    const pointsPerQuestion = 40; // 5 questions * 40 = 200 points total
+    const totalPointsEarned = correctCount * pointsPerQuestion; 
 
     // 2. Save everything to localStorage
     localStorage.setItem('challenge1_complete', 'true');
-    localStorage.setItem('challenge1_score', correctCount);     // For the Badge color
-    localStorage.setItem('challenge1_points', pointsEarned);     // For the XP Bar/Charts
+    localStorage.setItem('challenge1_score', correctCount);      // Used for badge color logic
+    localStorage.setItem('challenge1_points', totalPointsEarned); // This is what the Dashboard reads
     
-    // 3. Optional: Add a nice transition or alert
-    alert(`Stage 1 Finished! Final Score: ${correctCount}/5. Check your new badge on the progress page!`);
+    // 3. Success Feedback
+    alert(`Stage 1 Finished! You earned ${totalPointsEarned} YP. Returning to Dashboard...`);
     
     // 4. Redirect
     window.location.href = "dashboard.html"; 
 }
   window.onload = function() {
     initQuiz();
-    const learner = localStorage.getItem("learnerName"); // Fixed the dash here
-    if (learner && document.getElementById("learnerDisplay")) {
+    const learner = localStorage.getItem("learnerName"); 
+    if (learner) {
         document.getElementById("learnerDisplay").textContent = learner;
     }
 };
 </script>
 </body>
 </html>
+
 
 
 
