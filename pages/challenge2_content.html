@@ -273,11 +273,28 @@
     }
 
     function completeChallenge() {
-        localStorage.setItem('challenge2_complete', 'true');
-        alert("Challenge 2 Complete! Proceed to the next challenge.");
-        window.location.href = "challengesdash.html";
-    }
+    // Calculate final score
+    let finalScore = Object.values(userScores).filter(val => val === true).length;
+    
+    // Calculate Reward (e.g., 60 points per correct answer, max 300)
+    let rewardPoints = finalScore * 60;
+    
+    // Save to localStorage
+    localStorage.setItem('challenge2_complete', 'true');
+    localStorage.setItem('challenge2_score', finalScore);
+    localStorage.setItem('challenge2_points', rewardPoints);
+    
+    // Custom message based on performance
+    let message = "";
+    if (finalScore === 5) message = "Perfect! Pose Master Badge earned at Gold Level!";
+    else if (finalScore >= 4) message = "Great job! Pose Master Badge earned at Silver Level.";
+    else message = "Stage completed. Keep practicing to improve your score!";
+
+    alert(`${message} \nPoints Earned: ${rewardPoints}`);
+    window.location.href = "dashboard.html"; 
+}
 </script>
 
 </body>
 </html>
+
