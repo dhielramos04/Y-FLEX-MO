@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Selector</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind to use Inter font and custom colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#4c51bf',
+                        'primary-dark': '#1f2937',
+                        'surface': '#f9fafb',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- Inter Font Import -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for Avatar Selection */
+        .avatar-card {
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            border: 4px solid transparent;
+        }
+        .avatar-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .avatar-card.selected {
+            border-color: #4c51bf; /* Primary blue border for selected state */
+            box-shadow: 0 10px 20px -5px rgba(76, 81, 191, 0.5);
+            transform: scale(1.05);
+        }
+        .avatar-image {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            aspect-ratio: 1 / 1;
+        }
+    </style>
+</head>
+<body class="bg-surface min-h-screen font-sans p-4 md:p-8">
+
+    <main class="max-w-6xl mx-auto bg-white shadow-xl rounded-2xl p-6 md:p-10 border border-gray-100">
+        <h1 class="text-3xl font-bold text-primary-dark mb-8 border-b pb-3">
+            Avatar Selection
+        </h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+            <!-- Selected Avatar Display Area (Column 1) -->
+            <div class="lg:col-span-1 flex flex-col items-center justify-start bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-inner sticky top-8 h-fit">
+                <h2 class="text-xl font-semibold mb-4 text-primary-dark">Current Avatar</h2>
+                <div class="w-full max-w-xs p-2 bg-white rounded-lg shadow-lg border border-gray-300">
+                    <img id="currentAvatarDisplay" src="https://placehold.co/200x200/cccccc/333333?text=Select+an+Avatar" alt="Current selected avatar" class="rounded-lg avatar-image">
+                </div>
+
+                <div class="mt-6 w-full">
+                    <button id="saveButton" class="w-full px-5 py-3 bg-primary-blue text-white font-semibold rounded-lg hover:bg-indigo-700 transition duration-150 shadow-lg disabled:bg-gray-400" disabled>
+                        Save Selection
+                    </button>
+                </div>
+                <div id="messageBox" class="mt-4 text-sm font-medium text-green-600"></div>
+            </div>
+
+            <!-- Avatar Selection Grid (Columns 2, 3, 4) -->
+            <div class="lg:col-span-3 space-y-6">
+                <h2 class="text-2xl font-semibold mb-4 text-primary-dark">Choose Your Avatar</h2>
+                <div id="avatarGrid" class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                    <!-- Avatar Cards will be inserted here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // List of available avatars using the files in your assets folder
+        const avatars = [
+            { id: 'avatar-1', name: 'Peaceful Mind', src: 'assets/peacefulmind.png' },
+            { id: 'avatar-2', name: 'Calm Yoga', src: 'assets/calmyoga.png' },
+            { id: 'avatar-3', name: 'Dash Move', src: 'assets/dashmove.png' },
+            { id: 'avatar-4', name: 'Energetic', src: 'assets/energetic.png' },
+            { id: 'avatar-5', name: 'Flex Master', src: 'assets/flexmaster.png' },
+            { id: 'avatar-6', name: 'Zen Warrior', src: 'assets/zenwarrior.png' },
+        ];
+
+        // DOM elements
+        const currentAvatarDisplay = document.getElementById('currentAvatarDisplay');
+        const avatarGrid = document.getElementById('avatarGrid');
+        const saveButton = document.getElementById('saveButton');
+        const messageBox = document.getElementById('messageBox');
+
+        let selectedAvatarId = null;
+        let currentSavedAvatarId = null;
+
+        // --- Core Functions ---
+
+        /**
+         * Renders the grid of selectable avatars.
+         */
+        function renderAvatarGrid() {
+            avatarGrid.innerHTML = ''; 
+
+            avatars.forEach(avatar => {
+                const isSelected = selectedAvatarId === avatar.id;
+                
+                const card = document.createElement('div');
+                card.className = `avatar-card bg-white p-4 rounded-xl shadow-md ${isSelected ? 'selected' : ''}`;
+                card.id = `card-${avatar.id}`;
+                card.setAttribute('data-avatar-id', avatar.id);
+                card.setAttribute('data-avatar-src', avatar.src);
+
+                card.innerHTML = `
+                    <img src="${avatar.src}" alt="${avatar.name}" class="avatar-image rounded-lg mb-2">
+                    <p class="text-center font-medium text-primary-dark truncate">${avatar.name}</p>
+                `;
+
+                card.addEventListener('click', () => selectAvatar(avatar.id, avatar.src));
+                avatarGrid.appendChild(card);
+            });
+        }
+
+        /**
+         * Handles the selection of an avatar.
+         */
+        function selectAvatar(id, src) {
+            // Remove 'selected' class from all cards
+            document.querySelectorAll('.avatar-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Add 'selected' class to the clicked card
+            const selectedCard = document.getElementById(`card-${id}`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+
+            // Update state and display
+            selectedAvatarId = id;
+            currentAvatarDisplay.src = src;
+            currentAvatarDisplay.alt = `Selected Avatar: ${avatars.find(a => a.id === id).name}`;
+
+            // Enable save button if selection is different from the saved one
+            saveButton.disabled = (selectedAvatarId === currentSavedAvatarId);
+        }
+
+        /**
+         * Loads the saved avatar settings from localStorage.
+         */
+        function loadSettings() {
+            const savedId = localStorage.getItem('selectedAvatarId');
+            currentSavedAvatarId = savedId;
+
+            if (savedId) {
+                const savedAvatar = avatars.find(a => a.id === savedId);
+                if (savedAvatar) {
+                    selectedAvatarId = savedId;
+                    currentAvatarDisplay.src = savedAvatar.src;
+                    currentAvatarDisplay.alt = `Current Avatar: ${savedAvatar.name}`;
+                }
+            }
+            renderAvatarGrid();
+        }
+
+        /**
+         * Saves the currently selected avatar ID to localStorage.
+         */
+        function saveSelection() {
+            if (selectedAvatarId) {
+                localStorage.setItem('selectedAvatarId', selectedAvatarId);
+                currentSavedAvatarId = selectedAvatarId;
+                saveButton.disabled = true; 
+                showMessage('Avatar saved successfully!', 'success');
+            } else {
+                showMessage('Please select an avatar first.', 'info');
+            }
+        }
+
+        /**
+         * Displays a temporary message in the message box.
+         */
+        function showMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = 'mt-4 text-sm font-medium'; 
+            if (type === 'success') {
+                messageBox.classList.add('text-green-600');
+            } else if (type === 'info') {
+                messageBox.classList.add('text-primary-blue');
+            }
+
+            setTimeout(() => {
+                messageBox.textContent = '';
+                messageBox.className = 'mt-4 text-sm font-medium';
+            }, 3000);
+        }
+
+        // --- Event Listeners ---
+        saveButton.addEventListener('click', saveSelection);
+
+        // Initialize the application
+        window.onload = loadSettings;
+    </script>
+</body>
+</html>

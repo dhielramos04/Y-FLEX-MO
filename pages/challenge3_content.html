@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage 3: Performance Rubric & Upload</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* Changed background to pure white and text to a deep green-gray */
+        body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #14532d; }
+        
+        /* Updated table header to Emerald Green */
+        .rubric-table { width: 100%; border-collapse: collapse; background: white; border-radius: 1rem; overflow: hidden; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #dcfce7; }
+        .rubric-table th { background: #10b981; color: white; padding: 1rem; text-align: left; font-size: 0.875rem; }
+        .rubric-table td { padding: 1rem; border-bottom: 1px solid #f0fdf4; font-size: 0.75rem; vertical-align: top; }
+        
+        /* Updated legend box to light green theme */
+        .legend-box { background: #f0fdf4; padding: 1rem; border-radius: 0.75rem; font-weight: 700; font-size: 0.875rem; text-align: center; border: 2px solid #bbf7d0; }
+    </style>
+</head>
+<body class="pb-20">
+
+    <nav class="p-6 max-w-6xl mx-auto">
+        <a href="pages/dashboard.html" class="text-emerald-600 font-bold flex items-center hover:underline">
+            ← Back to Dashboard
+        </a>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6">
+       <header class="mb-10">
+    <h1 class="text-4xl font-black text-green-900 mb-2">Final Performance Phase</h1>
+    <p class="text-green-700 mb-6">Your video submission will be rated based on the professional rubric below.</p>
+    
+    <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-xl">
+        <h2 class="text-lg font-bold text-green-900 mb-3">Required Yoga Poses:</h2>
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-green-800 font-semibold">
+            <li>1. Mountain Pose</li>
+            <li>2. Downward-Facing Dog</li>
+            <li>3. Tree Pose</li>
+            <li>4. Warrior I</li>
+            <li>5. Warrior II</li>
+        </ul>
+    </div>
+</header>
+
+        <div class="legend-box mb-8 flex justify-around">
+            <span class="text-emerald-700">Excellent: 5</span>
+            <span class="text-green-600">Good: 4</span>
+            <span class="text-green-500">Acceptable: 3</span>
+            <span class="text-green-400">Progressing: 2 - 1</span>
+        </div>
+
+        <section class="mb-12 overflow-x-auto">
+            <table class="rubric-table">
+                <thead>
+                    <tr>
+                        <th>Criteria</th>
+                        <th>Excellent (5)</th>
+                        <th>Good (4)</th>
+                        <th>Acceptable (3)</th>
+                        <th>Progressing (2-1)</th>
+                    </tr>
+                </thead>
+            <tbody>
+    <tr>
+        <td class="font-bold bg-green-50">Flexibility</td>
+        <td>Displays excellent range of motion in all poses; movements are fluid, controlled, and show clear muscular elasticity.</td>
+        <td>Shows good range of motion in most poses with minimal stiffness.</td>
+        <td>Demonstrates moderate flexibility; range of motion is limited but functional.</td>
+        <td>Shows poor flexibility; movements are stiff and restrict proper pose execution.</td>
+    </tr>
+    <tr>
+        <td class="font-bold bg-green-50">Balance</td>
+        <td>Maintains complete stability in all standing and balancing poses without visible loss of control.</td>
+        <td>Maintains balance in most poses with minor adjustments.</td>
+        <td>Maintains balance inconsistently; frequent readjustments are needed.</td>
+        <td>Has difficulty maintaining balance; frequent loss of stability is observed.</td>
+    </tr>
+    <tr>
+        <td class="font-bold bg-green-50">Pose Accuracy</td>
+        <td>Executes all yoga poses with precise alignment, correct posture, and proper sequencing.</td>
+        <td>Executes most poses correctly with minor alignment errors.</td>
+        <td>Executes poses with noticeable errors in alignment and posture.</td>
+        <td>Executes poses inaccurately; alignment and posture are mostly incorrect.</td>
+    </tr>
+    <tr>
+        <td class="font-bold bg-green-50">Videography</td>
+        <td>Video is clear, stable, well-framed, and properly captures all poses from appropriate angles.</td>
+        <td>Video is mostly clear with minor issues in framing or stability.</td>
+        <td>Video quality is acceptable but limits full visibility of some poses.</td>
+        <td>Poor video quality; poses are difficult to observe and assess accurately.</td>
+    </tr>
+</tbody>
+            </table>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div class="bg-white p-8 rounded-3xl border border-green-200">
+                <h3 class="text-xl font-bold text-green-900 mb-4">Submission Directions</h3>
+                <ul class="text-sm text-green-800 space-y-3">
+                    <li>• Record your full yoga session (Sequencing the poses given).</li>
+                    <li>• Use varied camera angles and clear sound.</li>
+                    <li>• Ensure your "Execution of Skills" shows confidence.</li>
+                </ul>
+            </div>
+            
+            <a href="YOUR_UPLOAD_LINK" class="bg-emerald-600 rounded-3xl p-8 flex flex-col items-center justify-center text-white hover:bg-emerald-700 transition shadow-xl">
+                <span class="text-4xl mb-2">📤</span>
+                <span class="text-xl font-black">Upload Performance Video</span>
+                <span class="text-emerald-100 text-xs mt-2 text-center">Refer to the rubric above before submitting</span>
+            </a>
+        </div>
+
+        <div class="text-center">
+            <button onclick="finishStage3()" class="bg-green-900 text-white px-12 py-4 rounded-2xl font-bold hover:bg-black transition">
+                Mark as Submitted
+            </button>
+        </div>
+    </main>
+
+    <script>
+        function finishStage3() {
+            localStorage.setItem('challenge3_complete', 'true');
+            alert("Submission recorded based on manual rubric criteria.");
+            window.location.href = "challengesdash.html";
+        }
+    </script>
+</body>
+</html>
