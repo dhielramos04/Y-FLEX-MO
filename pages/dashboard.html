@@ -284,9 +284,52 @@
     };
 
     // (Keep your helper functions unlockStage and unlockBadge below)
+      // --- HELPER FUNCTIONS ---
+
+    function unlockStage(elementId, destinationFile) {
+        const card = document.getElementById(elementId);
+        if (!card) return;
+        
+        card.classList.remove('locked-state');
+        card.classList.add('active-card');
+        
+        const btn = card.querySelector('button');
+        if (btn) {
+            btn.removeAttribute('disabled');
+            btn.className = "w-full bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-lg cursor-pointer";
+            btn.innerText = "Start Stage";
+            btn.onclick = function() { window.location.href = destinationFile; };
+        }
+    }
+
+    function unlockBadge(index, score) {
+        const container = document.getElementById('badges-container');
+        if (!container || !container.children[index]) return;
+
+        const badgeBox = container.children[index];
+        const badgeIcon = badgeBox.querySelector('div');
+        const badgeText = badgeBox.querySelector('p');
+
+        badgeBox.classList.remove('opacity-30', 'grayscale');
+        badgeIcon.classList.remove('border-dashed', 'border-gray-300');
+        badgeIcon.classList.add('border-solid', 'shadow-sm', 'badge-unlock');
+
+        // Color coding based on quiz performance
+        if (score >= 5) {
+            badgeIcon.classList.add('border-yellow-400', 'bg-yellow-50');
+            badgeText.classList.replace('text-gray-400', 'text-yellow-700');
+        } else if (score >= 3) {
+            badgeIcon.classList.add('border-green-500', 'bg-green-50');
+            badgeText.classList.replace('text-gray-400', 'text-green-700');
+        } else {
+            badgeIcon.classList.add('border-orange-300', 'bg-orange-50');
+            badgeText.classList.replace('text-gray-400', 'text-orange-600');
+        }
+    }
 </script>
 </body>
 
 </html>
+
 
 
