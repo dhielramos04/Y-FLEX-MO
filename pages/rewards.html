@@ -138,28 +138,58 @@
         </section>
     </main>
 
-    <script>
-        window.onload = function() {
-            // Check progress from LocalStorage (Sync with Dashboard)
-            const stage1Complete = localStorage.getItem('challenge1_complete') === 'true';
-            const points = stage1Complete ? "300" : "100";
-            const badgeCount = stage1Complete ? "1" : "0";
+   <script>
+    window.onload = function() {
+        // 1. Get Points from all stages
+        const s1Points = parseInt(localStorage.getItem('challenge1_points')) || 0;
+        const s2Points = parseInt(localStorage.getItem('challenge2_points')) || 0;
+        const s3Points = parseInt(localStorage.getItem('challenge3_points')) || 0;
+        const totalPoints = s1Points + s2Points + s3Points;
 
-            // Update Header Stats
-            document.getElementById('points-display').innerText = points;
-            document.getElementById('badges-display').innerText = badgeCount;
+        // 2. Get Completion Status
+        const s1Complete = localStorage.getItem('challenge1_complete') === 'true';
+        const s2Complete = localStorage.getItem('challenge2_complete') === 'true';
+        const s3Complete = localStorage.getItem('challenge3_complete') === 'true';
 
-            // Unlock Logic for Badge 1
-            if (stage1Complete) {
-                const b1 = document.getElementById('badge-history');
-                b1.classList.remove('locked-badge', 'border-dashed');
-                b1.classList.add('unlocked', 'border-solid', 'bg-white', 'shadow-sm');
-                b1.querySelector('.lock-icon').style.display = 'none';
-                b1.querySelector('p').innerText = "Unlocked!";
-                b1.querySelector('p').classList.replace('text-gray-500', 'text-green-600');
-                b1.querySelector('p').classList.add('font-bold');
-            }
-        };
-    </script>
+        // 3. Calculate Badge Count
+        let badgeCount = 0;
+        if (s1Complete) badgeCount++;
+        if (s2Complete) badgeCount++;
+        if (s3Complete) badgeCount++;
+
+        // 4. Update Header Stats
+        document.getElementById('points-display').innerText = totalPoints;
+        document.getElementById('badges-display').innerText = badgeCount;
+
+        // 5. Update Rank Text
+        const rankDisplay = document.querySelector('h3.text-orange-500');
+        if (totalPoints >= 800) {
+            rankDisplay.innerText = "Master";
+        } else if (totalPoints >= 400) {
+            rankDisplay.innerText = "Intermediate";
+        } else {
+            rankDisplay.innerText = "Novice";
+        }
+
+        // 6. Unlock Logic Helper
+        function unlockUI(elementId) {
+            const card = document.getElementById(elementId);
+            card.classList.remove('locked-badge', 'border-dashed');
+            card.classList.add('unlocked', 'border-solid', 'bg-white', 'shadow-sm', 'border-green-500');
+            card.querySelector('.lock-icon').style.display = 'none';
+            
+            const statusText = card.querySelector('p');
+            statusText.innerText = "Unlocked!";
+            statusText.classList.replace('text-gray-500', 'text-green-600');
+            statusText.classList.add('font-bold');
+        }
+
+        // Apply Unlocks
+        if (s1Complete) unlockUI('badge-history');
+        if (s2Complete) unlockUI('badge-pose');
+        if (s3Complete) unlockUI('badge-zen');
+    };
+</script>
 </body>
+
 </html>
