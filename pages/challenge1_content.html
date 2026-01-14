@@ -94,107 +94,115 @@
 
             <div id="quiz-container" class="space-y-8"></div>
 
-            <div id="completion-zone" class="mt-16 text-center hidden">
-                <div class="bg-green-600 text-white p-6 rounded-2xl mb-6 font-bold shadow-lg">
-                    ✨ Well done! You have mastered the foundations.
-                </div>
-                <button onclick="finishChallenge()" class="bg-green-700 text-white px-12 py-4 rounded-2xl font-bold text-xl hover:bg-green-800 transition shadow-xl">
-                    Complete Challenge 1
-                </button>
-            </div>
+           <div id="completion-zone" class="mt-16 text-center hidden">
+    <div class="bg-green-600 text-white p-6 rounded-2xl mb-6 font-bold shadow-lg">
+        ✨ Stage 1 Attempted! Your Score: <span id="final-score">0</span> / 5
+    </div>
+    <p class="text-green-800 mb-6 font-medium">You've earned the History Buff Badge and +200 YP!</p>
+    <button onclick="finishChallenge()" class="bg-green-700 text-white px-12 py-4 rounded-2xl font-bold text-xl hover:bg-green-800 transition shadow-xl">
+        Complete Challenge 1
+    </button>
+</div>
         </section>
     </main>
 
     <script>
-        const quizData = [
-            {
-                question: "What is the fundamental purpose of yoga?",
-                options: ["To build muscle mass only", "To promote harmony of body, mind, and environment", "To serve as a competitive sport", "To replace medical treatment"],
-                answer: "To promote harmony of body, mind, and environment"
-            },
-            {
-                question: "Which yoga style is most suitable for beginners due to its gentle and slow-paced nature?",
-                options: ["Vinyasa Yoga", "Ashtanga Yoga", "Hatha Yoga", "Power Yoga"],
-                answer: "Hatha Yoga"
-            },
-            {
-                question: "Which type of yoga follows a fixed and structured sequence of postures synchronized with breathing?",
-                options: ["Hatha Yoga", "Vinyasa Yoga", "Ashtanga Yoga", "Restorative Yoga"],
-                answer: "Ashtanga Yoga"
-            },
-            {
-                question: "In Vinyasa Yoga, how should movements be performed?",
-                options: ["Independently from breathing", "In long static holds", "In a flowing sequence synchronized with the breath", "Only while seated"],
-                answer: "In a flowing sequence synchronized with the breath"
-            },
-            {
-                question: "Which of the following is a documented benefit of regular yoga practice?",
-                options: ["Increased stress hormone levels", "Reduced flexibility", "Improved strength, balance, and mental clarity", "Sleep disruption"],
-                answer: "Improved strength, balance, and mental clarity"
-            }
-        ];
+    const quizData = [
+        {
+            question: "What is the fundamental purpose of yoga?",
+            options: ["To build muscle mass only", "To promote harmony of body, mind, and environment", "To serve as a competitive sport", "To replace medical treatment"],
+            answer: "To promote harmony of body, mind, and environment"
+        },
+        {
+            question: "Which yoga style is most suitable for beginners due to its gentle and slow-paced nature?",
+            options: ["Vinyasa Yoga", "Ashtanga Yoga", "Hatha Yoga", "Power Yoga"],
+            answer: "Hatha Yoga"
+        },
+        {
+            question: "Which type of yoga follows a fixed and structured sequence of postures synchronized with breathing?",
+            options: ["Hatha Yoga", "Vinyasa Yoga", "Ashtanga Yoga", "Restorative Yoga"],
+            answer: "Ashtanga Yoga"
+        },
+        {
+            question: "In Vinyasa Yoga, how should movements be performed?",
+            options: ["Independently from breathing", "In long static holds", "In a flowing sequence synchronized with the breath", "Only while seated"],
+            answer: "In a flowing sequence synchronized with the breath"
+        },
+        {
+            question: "Which of the following is a documented benefit of regular yoga practice?",
+            options: ["Increased stress hormone levels", "Reduced flexibility", "Improved strength, balance, and mental clarity", "Sleep disruption"],
+            answer: "Improved strength, balance, and mental clarity"
+        }
+    ];
 
-        let userScores = new Array(quizData.length).fill(false);
+    // --- NEW VARIABLES ---
+    let userScores = new Array(quizData.length).fill(false);
+    let answeredQuestions = new Set(); // Tracks which questions were clicked
+    let correctCount = 0; // Tracks total correct answers
 
-        function initQuiz() {
-            const container = document.getElementById('quiz-container');
-            container.innerHTML = quizData.map((q, qIdx) => `
-                <div class="bg-white p-8 rounded-3xl border border-green-100 shadow-sm">
-                    <h3 class="font-bold text-lg mb-6 text-green-900">${qIdx + 1}. ${q.question}</h3>
-                    <div class="grid grid-cols-1 gap-3">
-                        ${q.options.map(opt => `
-                            <button onclick="checkAnswer(this, ${qIdx}, '${opt.replace(/'/g, "\\'")}')" 
-                                    class="option-btn p-4 rounded-xl text-left font-medium text-gray-700">
-                                ${opt}
-                            </button>
-                        `).join('')}
-                    </div>
+    function initQuiz() {
+        const container = document.getElementById('quiz-container');
+        container.innerHTML = quizData.map((q, qIdx) => `
+            <div class="bg-white p-8 rounded-3xl border border-green-100 shadow-sm">
+                <h3 class="font-bold text-lg mb-6 text-green-900">${qIdx + 1}. ${q.question}</h3>
+                <div class="grid grid-cols-1 gap-3">
+                    ${q.options.map(opt => `
+                        <button onclick="checkAnswer(this, ${qIdx}, '${opt.replace(/'/g, "\\'")}')" 
+                                class="option-btn p-4 rounded-xl text-left font-medium text-gray-700">
+                            ${opt}
+                        </button>
+                    `).join('')}
                 </div>
-            `).join('');
+            </div>
+        `).join('');
+    }
+
+    function checkAnswer(btn, qIdx, selected) {
+        const isCorrect = selected === quizData[qIdx].answer;
+        const buttons = btn.parentElement.querySelectorAll('.option-btn');
+        
+        buttons.forEach(b => b.classList.remove('selected', 'correct', 'wrong'));
+
+        // Logic to track the score correctly even if they change their mind
+        if (isCorrect) {
+            btn.classList.add('correct');
+            if (!userScores[qIdx]) correctCount++; 
+            userScores[qIdx] = true;
+        } else {
+            btn.classList.add('wrong');
+            if (userScores[qIdx]) correctCount--; 
+            userScores[qIdx] = false;
         }
 
-        function checkAnswer(btn, qIdx, selected) {
-            const isCorrect = selected === quizData[qIdx].answer;
-            const buttons = btn.parentElement.querySelectorAll('.option-btn');
-            
-            buttons.forEach(b => b.classList.remove('selected', 'correct', 'wrong'));
+        // Mark question as attempted
+        answeredQuestions.add(qIdx);
 
-            if (isCorrect) {
-                btn.classList.add('correct');
-                userScores[qIdx] = true;
-            } else {
-                btn.classList.add('wrong');
-                userScores[qIdx] = false;
-            }
-
-            if (userScores.every(val => val === true)) {
-                document.getElementById('completion-zone').classList.remove('hidden');
-                document.getElementById('completion-zone').scrollIntoView({ behavior: 'smooth' });
-            } else {
-                document.getElementById('completion-zone').classList.add('hidden');
-            }
+        // --- CHANGE: Show results after all 5 questions are attempted ---
+        if (answeredQuestions.size === quizData.length) {
+            document.getElementById('final-score').innerText = correctCount;
+            document.getElementById('completion-zone').classList.remove('hidden');
+            document.getElementById('completion-zone').scrollIntoView({ behavior: 'smooth' });
         }
+    }
 
-        function finishChallenge() {
-            localStorage.setItem('challenge1_complete', 'true');
-            alert("Congratulations! Challenge 1 is complete.");
-            window.location.href = "dashboard.html";
+    function finishChallenge() {
+        // Save status and score to localStorage
+        localStorage.setItem('challenge1_complete', 'true');
+        localStorage.setItem('challenge1_score', correctCount);
+        
+        alert(`Stage 1 Finished! Final Score: ${correctCount}/5. Returning to Dashboard.`);
+        window.location.href = "dashboard.html";
+    }
+
+    window.onload = function() {
+        initQuiz();
+        // Load name
+        const learner = localStorage.getItem("learnerName");-
+        if (learner && document.getElementById("learnerDisplay")) {
+            document.getElementById("learnerDisplay").textContent = learner;
         }
-
-        window.onload = function() {
-            // 1. Initialize the quiz questions
-            initQuiz();
-
-            // 2. Load the learner's name from storage
-            const learner = localStorage.getItem("learnerName");
-            if (learner) {
-                // Look for the element where the name should go
-                const display = document.getElementById("learnerDisplay");
-                if (display) {
-                    display.textContent = learner;
-                }
-            }
-        };
-    </script>
+    };
+</script>
 </body>
 </html>
+
