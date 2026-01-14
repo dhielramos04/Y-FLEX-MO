@@ -138,32 +138,59 @@
     </main>
 
     <script>
-        window.onload = function() {
-            const isStage1Done = localStorage.getItem('challenge1_complete') === 'true';
-            const ring = document.getElementById('progress-ring');
-            const percentText = document.getElementById('percent-text');
-            const circumference = 2 * Math.PI * 88;
+    window.onload = function() {
+        // 1. Fetch data for all stages
+        const s1Done = localStorage.getItem('challenge1_complete') === 'true';
+        const s2Done = localStorage.getItem('challenge2_complete') === 'true';
+        const s3Done = localStorage.getItem('challenge3_complete') === 'true';
+        
+        const s1Score = parseInt(localStorage.getItem('challenge1_score')) || 0;
+        const s2Score = parseInt(localStorage.getItem('challenge2_score')) || 0;
+        const s3Score = parseInt(localStorage.getItem('challenge3_score')) || 0;
 
-            if (isStage1Done) {
-                // Update Progress Ring (33% for one stage)
-                const offset = circumference - (0.33 * circumference);
-                ring.style.strokeDashoffset = offset;
-                percentText.innerText = "33%";
+        // 2. Calculate Completion Percentage
+        const completedCount = [s1Done, s2Done, s3Done].filter(Boolean).length;
+        const percent = Math.round((completedCount / 3) * 100);
 
-                // Update Objective Checklist
-                const check = document.getElementById('obj-1-check');
-                check.innerHTML = "✓";
-                check.classList.add('bg-green-600', 'border-green-600');
-                document.getElementById('obj-1-status').innerText = "Achieved";
-                document.getElementById('obj-1-status').classList.replace('text-green-400', 'text-green-600');
+        // 3. Update Progress Ring
+        const ring = document.getElementById('progress-ring');
+        const percentText = document.getElementById('percent-text');
+        const circumference = 2 * Math.PI * 88;
+        const offset = circumference - (percent / 100 * circumference);
+        
+        ring.style.strokeDashoffset = offset;
+        percentText.innerText = percent + "%";
 
-                // Update Chart
-                document.getElementById('today-bar').style.height = "80%";
-            } else {
-                ring.style.strokeDashoffset = circumference;
-                percentText.innerText = "0%";
-            }
-        };
-    </script>
+        // 4. Update Objectives Checklist
+        updateChecklist(1, s1Done);
+        updateChecklist(2, s2Done);
+        updateChecklist(3, s3Done);
+
+        // 5. Update XP Chart (Visual representation of total score)
+        const totalPoints = (s1Score + s2Score + s3Score);
+        const todayBar = document.getElementById('today-bar');
+        // Assume 15 points (5 per quiz) is a "full" bar
+        const barHeight = Math.min((totalPoints / 15) * 100, 100); 
+        todayBar.style.height = barHeight + "%";
+    };
+
+    // Helper function to keep code clean
+    function updateChecklist(stageNum, isDone) {
+        // You'll need to add IDs like 'obj-2-check' to your HTML tags for this to work
+        const check = document.getElementById(`obj-${stageNum}-check`);
+        const status = document.getElementById(`obj-${stageNum}-status`);
+        const container = check?.parentElement;
+
+        if (isDone && check && status) {
+            check.innerHTML = "✓";
+            check.classList.add('bg-green-600', 'border-green-600');
+            status.innerText = "Achieved";
+            status.classList.replace('text-green-400', 'text-green-600');
+            container.classList.remove('opacity-60', 'bg-gray-50');
+            container.classList.add('bg-green-50', 'border-green-100');
+        }
+    }
+</script>
 </body>
+
 </html>
