@@ -249,19 +249,25 @@
 </main>
 
 <script>
-    // Track which questions are answered correctly
+    // Track which questions have been ATTEMPTED
+    let answeredQuestions = new Set();
+    // Track which questions are CORRECT (for scoring/badges)
     let answeredCorrectly = new Set();
+    
     const totalQuestions = 5;
 
     function check(btn, isCorrect) {
         const parent = btn.parentElement;
         const buttons = parent.querySelectorAll('.option-btn');
         
-        // Find the index of this question to track it uniquely
+        // Find the index of this question
         const questionIndex = Array.from(document.querySelectorAll('.quiz-item')).indexOf(parent);
 
         // Reset visual state of buttons in this question
         buttons.forEach(b => b.classList.remove('correct', 'incorrect'));
+
+        // Mark that this question has been attempted
+        answeredQuestions.add(questionIndex);
 
         if (isCorrect) {
             btn.classList.add('correct');
@@ -269,11 +275,19 @@
         } else {
             btn.classList.add('incorrect');
             answeredCorrectly.delete(questionIndex);
+            
+            // Optional: Show the user which one was actually correct
+            // This helps them learn even if they get it wrong
+            buttons.forEach(b => {
+                if (b.getAttribute('onclick').includes('true')) {
+                    b.classList.add('correct');
+                }
+            });
         }
 
-        // Show the completion button only if they have attempted all or got them all right
-        // Here, we show it once they reach the target score
-        if (answeredCorrectly.size === totalQuestions) {
+        // SHOW COMPLETION BUTTON:
+        // Now it shows as long as every question has been answered once
+        if (answeredQuestions.size === totalQuestions) {
             document.getElementById('completion-zone').classList.remove('hidden');
             document.getElementById('completion-zone').scrollIntoView({ behavior: 'smooth' });
         }
@@ -282,21 +296,20 @@
     function completeChallenge() {
         const finalScore = answeredCorrectly.size;
         
-        // Calculate Points for the Progress Bar (100 points max)
-        // This makes the XP bar grow by a fair amount
+        // Points logic based on actual correct answers
         const rewardPoints = (finalScore / totalQuestions) * 100;
         
         // --- SAVE TO LOCALSTORAGE ---
         localStorage.setItem('challenge2_complete', 'true');
-        localStorage.setItem('challenge2_score', finalScore);     // Used for Badge Color
-        localStorage.setItem('challenge2_points', rewardPoints);   // Used for XP Bar/Progress
+        localStorage.setItem('challenge2_score', finalScore);     // Still used for Badge Color
+        localStorage.setItem('challenge2_points', rewardPoints);   // Still used for XP Bar
         
-        // Provide feedback
-        let rank = "Bronze";
-        if (finalScore === 5) rank = "Gold";
-        else if (finalScore >= 3) rank = "Silver";
+        // Rank Feedback
+        let rank = "Bronze (Trainee)";
+        if (finalScore === 5) rank = "Gold (Master)";
+        else if (finalScore >= 3) rank = "Silver (Practitioner)";
 
-        alert(`Challenge 2 Complete!\nScore: ${finalScore}/5\nRank: ${rank}\nPoints: ${rewardPoints}`);
+        alert(`Challenge 2 Finished!\nYour Score: ${finalScore}/5\nEarned Rank: ${rank}\nXP Points: ${rewardPoints}`);
         
         // Redirect to dashboard
         window.location.href = "dashboard.html"; 
@@ -305,5 +318,6 @@
 
 </body>
 </html>
+
 
 
