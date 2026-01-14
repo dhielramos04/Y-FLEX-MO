@@ -119,12 +119,25 @@
         </div>
     </main>
 
-    <script>
-        function finishStage3() {
-            localStorage.setItem('challenge3_complete', 'true');
-            alert("Submission recorded based on manual rubric criteria.");
-            window.location.href = "challengesdash.html";
-        }
-    </script>
+   <script>
+    function finishStage3() {
+        // Awarding perfect points for the final performance effort
+        const perfectScore = 5;
+        const maxPoints = 400; 
+
+        // 1. Save completion status
+        localStorage.setItem('challenge3_complete', 'true');
+        
+        // 2. Save score data for the Dashboard calculations
+        localStorage.setItem('challenge3_score', perfectScore);
+        localStorage.setItem('challenge3_points', maxPoints);
+        
+        alert("Performance Video Submitted! Returning to your Dashboard to see your final rank.");
+        
+        // 3. Send them back to the dashboard
+        window.location.href = "dashboard.html"; 
+    }
+</script>
 </body>
+
 </html>
