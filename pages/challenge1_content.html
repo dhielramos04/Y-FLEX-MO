@@ -188,21 +188,20 @@
         }
     }
 
-   function finishChallenge() {
-    // 1. Calculate points: if score is 5/5, they get the full 200 points.
-    // If they get 4/5, they get 160 points, etc.
-    const pointsPerQuestion = 40; // 5 questions * 40 = 200 points total
+  function finishChallenge() {
+    // 1. Calculate points: 40 points per correct answer (5 correct = 200 YP)
+    const pointsPerQuestion = 40; 
     const totalPointsEarned = correctCount * pointsPerQuestion; 
 
-    // 2. Save everything to localStorage
+    // 2. SAVE TO LOCAL STORAGE
+    // Use 'challenge1_points' so the dashboard can find it
+    localStorage.setItem('challenge1_points', totalPointsEarned); 
+    
+    // Save completion status and score for badges
     localStorage.setItem('challenge1_complete', 'true');
-    localStorage.setItem('challenge1_score', correctCount);      // Used for badge color logic
-    localStorage.setItem('challenge1_points', totalPointsEarned); // This is what the Dashboard reads
+    localStorage.setItem('challenge1_score', correctCount); 
     
-    // 3. Success Feedback
-    alert(`Stage 1 Finished! You earned ${totalPointsEarned} YP. Returning to Dashboard...`);
-    
-    // 4. Redirect
+    // 3. Redirect back to dashboard
     window.location.href = "dashboard.html"; 
 }
   window.onload = function() {
@@ -215,6 +214,7 @@
 </script>
 </body>
 </html>
+
 
 
 
