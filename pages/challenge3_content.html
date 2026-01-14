@@ -105,11 +105,14 @@
                 </ul>
             </div>
             
-            <a href="YOUR_UPLOAD_LINK" class="bg-emerald-600 rounded-3xl p-8 flex flex-col items-center justify-center text-white hover:bg-emerald-700 transition shadow-xl">
-                <span class="text-4xl mb-2">📤</span>
-                <span class="text-xl font-black">Upload Performance Video</span>
-                <span class="text-emerald-100 text-xs mt-2 text-center">Refer to the rubric above before submitting</span>
-            </a>
+           <a href="YOUR_UPLOAD_LINK" 
+   onclick="uploadClicked = true" 
+   target="_blank" 
+   class="bg-emerald-600 rounded-3xl p-8 flex flex-col items-center justify-center text-white hover:bg-emerald-700 transition shadow-xl">
+    <span class="text-4xl mb-2">📤</span>
+    <span class="text-xl font-black">Upload Performance Video</span>
+    <span class="text-emerald-100 text-xs mt-2 text-center">Refer to the rubric above before submitting</span>
+</a>
         </div>
 
         <div class="text-center">
@@ -120,24 +123,29 @@
     </main>
 
    <script>
+    // 1. Create the variable at the very top of the script
+    let uploadClicked = false;
+
     function finishStage3() {
-        // Awarding perfect points for the final performance effort
+        // 2. Check if the user clicked the upload link first
+        if (!uploadClicked) {
+            alert("Please click the 'Upload Performance Video' link to submit your work before marking this stage as finished!");
+            return; // This stops the function from saving progress
+        }
+
+        // 3. If they DID click it, proceed with saving
         const perfectScore = 5;
         const maxPoints = 400; 
 
-        // 1. Save completion status
         localStorage.setItem('challenge3_complete', 'true');
-        
-        // 2. Save score data for the Dashboard calculations
         localStorage.setItem('challenge3_score', perfectScore);
         localStorage.setItem('challenge3_points', maxPoints);
         
         alert("Performance Video Submitted! Returning to your Dashboard to see your final rank.");
-        
-        // 3. Send them back to the dashboard
         window.location.href = "dashboard.html"; 
     }
 </script>
 </body>
 
 </html>
+
