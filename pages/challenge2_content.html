@@ -249,52 +249,61 @@
 </main>
 
 <script>
-    let correctAnswers = 0;
+    // Track which questions are answered correctly
+    let answeredCorrectly = new Set();
     const totalQuestions = 5;
 
     function check(btn, isCorrect) {
         const parent = btn.parentElement;
         const buttons = parent.querySelectorAll('.option-btn');
+        
+        // Find the index of this question to track it uniquely
+        const questionIndex = Array.from(document.querySelectorAll('.quiz-item')).indexOf(parent);
+
+        // Reset visual state of buttons in this question
         buttons.forEach(b => b.classList.remove('correct', 'incorrect'));
 
         if (isCorrect) {
             btn.classList.add('correct');
-            if (!parent.dataset.answered) {
-                correctAnswers++;
-                parent.dataset.answered = "true";
-            }
+            answeredCorrectly.add(questionIndex);
         } else {
             btn.classList.add('incorrect');
+            answeredCorrectly.delete(questionIndex);
         }
 
-        if (correctAnswers === totalQuestions) {
+        // Show the completion button only if they have attempted all or got them all right
+        // Here, we show it once they reach the target score
+        if (answeredCorrectly.size === totalQuestions) {
             document.getElementById('completion-zone').classList.remove('hidden');
+            document.getElementById('completion-zone').scrollIntoView({ behavior: 'smooth' });
         }
     }
 
     function completeChallenge() {
-    // Calculate final score
-    let finalScore = Object.values(userScores).filter(val => val === true).length;
-    
-    // Calculate Reward (e.g., 60 points per correct answer, max 300)
-    let rewardPoints = finalScore * 60;
-    
-    // Save to localStorage
-    localStorage.setItem('challenge2_complete', 'true');
-    localStorage.setItem('challenge2_score', finalScore);
-    localStorage.setItem('challenge2_points', rewardPoints);
-    
-    // Custom message based on performance
-    let message = "";
-    if (finalScore === 5) message = "Perfect! Pose Master Badge earned at Gold Level!";
-    else if (finalScore >= 4) message = "Great job! Pose Master Badge earned at Silver Level.";
-    else message = "Stage completed. Keep practicing to improve your score!";
+        const finalScore = answeredCorrectly.size;
+        
+        // Calculate Points for the Progress Bar (100 points max)
+        // This makes the XP bar grow by a fair amount
+        const rewardPoints = (finalScore / totalQuestions) * 100;
+        
+        // --- SAVE TO LOCALSTORAGE ---
+        localStorage.setItem('challenge2_complete', 'true');
+        localStorage.setItem('challenge2_score', finalScore);     // Used for Badge Color
+        localStorage.setItem('challenge2_points', rewardPoints);   // Used for XP Bar/Progress
+        
+        // Provide feedback
+        let rank = "Bronze";
+        if (finalScore === 5) rank = "Gold";
+        else if (finalScore >= 3) rank = "Silver";
 
-    alert(`${message} \nPoints Earned: ${rewardPoints}`);
-    window.location.href = "dashboard.html"; 
-}
+        alert(`Challenge 2 Complete!\nScore: ${finalScore}/5\nRank: ${rank}\nPoints: ${rewardPoints}`);
+        
+        // Redirect to dashboard
+        window.location.href = "dashboard.html"; 
+    }
 </script>
 
 </body>
 </html>
+
 
