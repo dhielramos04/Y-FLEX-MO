@@ -21,7 +21,7 @@
 <body class="pb-20">
 
     <nav class="p-6 max-w-5xl mx-auto">
-        <a href="challengesdash.html" class="text-green-700 font-bold flex items-center hover:text-green-900 transition">
+        <a href="../dashboard.html" class="text-green-700 font-bold flex items-center hover:text-green-900 transition">
             ← Back to Challenges
         </a>
     </nav>
@@ -178,10 +178,23 @@
         function finishChallenge() {
             localStorage.setItem('challenge1_complete', 'true');
             alert("Congratulations! Challenge 1 is complete.");
-            window.location.href = "challengesdash.html";
+            window.location.href = "dashboard.html";
         }
 
-        window.onload = initQuiz;
+        window.onload = function() {
+            // 1. Initialize the quiz questions
+            initQuiz();
+
+            // 2. Load the learner's name from storage
+            const learner = localStorage.getItem("learnerName");
+            if (learner) {
+                // Look for the element where the name should go
+                const display = document.getElementById("learnerDisplay");
+                if (display) {
+                    display.textContent = learner;
+                }
+            }
+        };
     </script>
 </body>
 </html>
