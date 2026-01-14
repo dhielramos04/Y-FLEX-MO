@@ -241,33 +241,35 @@
         }
        // --- 5. STAGE 3 COMPLETION LOGIC ---
     if (localStorage.getItem('challenge3_complete') === 'true') {
-    // 1. Calculate dynamic points from ALL stages
+    // 1. Get all points to show the final grand total
     const s1Points = parseInt(localStorage.getItem('challenge1_points')) || 0;
     const s2Points = parseInt(localStorage.getItem('challenge2_points')) || 0;
     const s3Points = parseInt(localStorage.getItem('challenge3_points')) || 0;
     const finalTotal = s1Points + s2Points + s3Points;
 
-    // 2. Update Stats (XP Bar hits 100% if scores were good)
+    // 2. Update UI with "Master" status
     document.getElementById('total-points').innerText = finalTotal;
     document.getElementById('current-xp').innerText = finalTotal;
     document.getElementById('badge-count').innerText = "3";
     
-    // Fill XP bar to 100%
+    // Fill XP bar to 100% and update Level text
     document.getElementById('xp-bar').style.width = "100%";
-    document.getElementById('user-level').innerText = "Master";
+    const levelDisplay = document.getElementById('user-level');
+    if (levelDisplay) levelDisplay.innerText = "Master";
 
-    // 3. Unlock the Final Badge (Zen Warrior)
-    // We pass '5' because we set Stage 3 as a perfect score
+    // 3. Unlock the Final Badge (Index 2 is the 3rd badge)
+    // We pass '5' so the unlockBadge function gives it the "Gold" style
     unlockBadge(2, 5); 
 
-    // 4. Update the Stage 3 Card UI to show "Completed"
+    // 4. Update the Stage 3 Card appearance
     const s3 = document.getElementById('challenge-3');
-    const btn3 = s3.querySelector('button');
-    btn3.innerText = "✅ Completed";
-    btn3.className = "w-full bg-black text-white py-4 rounded-2xl font-bold cursor-default";
-    btn3.onclick = null;
-}
-        }
+    if (s3) {
+        const btn3 = s3.querySelector('button');
+        btn3.innerText = "✅ Completed";
+        btn3.className = "w-full bg-black text-white py-4 rounded-2xl font-bold cursor-default";
+        btn3.onclick = null; // Disable clicking since it is finished
+    }
+        
     };
 
     // Helper Function to Unlock a Stage
@@ -317,55 +319,4 @@
 </body>
 
 </html>
-
-
-    // Helper Function to Unlock a Stage
-    function unlockStage(elementId, destinationFile) {
-        const card = document.getElementById(elementId);
-        card.classList.remove('locked-state');
-        card.classList.add('active-card');
-        
-        const btn = card.querySelector('button');
-        btn.removeAttribute('disabled');
-        btn.className = "w-full bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-lg cursor-pointer";
-        btn.innerText = "Start Stage";
-        
-        btn.onclick = function() {
-            window.location.href = destinationFile;
-        };
-    }
-
-    // Updated Helper: Changes Badge based on score (Decreasing Reward)
-    function unlockBadge(index, score) {
-        const badgeBox = document.getElementById('badges-container').children[index];
-        const badgeIcon = badgeBox.querySelector('div');
-        const badgeText = badgeBox.querySelector('p');
-
-        badgeBox.classList.remove('opacity-30', 'grayscale');
-        badgeIcon.classList.remove('border-dashed', 'border-gray-300');
-        badgeIcon.classList.add('border-solid', 'shadow-sm');
-
-        // Logic for decreasing rewards (Visual/Text)
-        if (score >= 4) {
-            // Gold/High Performance
-            badgeIcon.classList.add('border-yellow-400', 'bg-yellow-50');
-            badgeBox.classList.add('badge-unlock'); // Animation
-            badgeText.classList.replace('text-gray-400', 'text-yellow-700');
-        } else if (score >= 2) {
-            // Silver/Medium Performance
-            badgeIcon.classList.add('border-green-500', 'bg-green-50');
-            badgeText.classList.replace('text-gray-400', 'text-green-700');
-        } else {
-            // Bronze/Low Performance (Decreased Reward)
-            badgeIcon.classList.add('border-orange-300', 'bg-orange-50');
-            badgeText.classList.replace('text-gray-400', 'text-orange-600');
-            badgeText.innerText += " (Trainee)";
-        }
-    }
-</script>
-</body>
-
-</html>
-
-
 
