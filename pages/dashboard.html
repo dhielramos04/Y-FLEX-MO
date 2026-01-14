@@ -62,9 +62,18 @@
 <body>
 
     <aside class="sidebar">
-        <div class="p-8">
-            <h1 class="text-2xl font-black text-green-800 tracking-tighter">Y-FLEX MO</h1>
-        </div>
+    <div class="p-8 flex items-center space-x-3">
+        <img 
+            src="../assets/images/logo.png" 
+            alt="Y-Flex Mo Logo" 
+            class="h-10 w-10 object-contain"
+            onerror="this.onerror=null;this.src='https://placehold.co/40x40/171717/34D399?text=Y';"
+        >
+        
+        <h1 class="text-2xl font-black text-green-800 tracking-tighter">
+            Y-FLEX MO
+        </h1>
+    </div>
 
         <div class="px-6 mb-6">
             <div class="bg-green-50 p-4 rounded-2xl border border-green-100">
@@ -73,7 +82,9 @@
                         <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="avatar">
                     </div>
                     <div>
-                        <p class="text-sm font-bold text-green-900">Yoga Learner</p>
+                        <p class="text-sm font-bold text-green-900">
+    Welcome, <span id="learnerDisplay">Yoga Learner</span>
+</p>
                         <p class="text-xs text-green-600 font-medium">Level <span id="user-level">1</span> Practitioner</p>
                     </div>
                 </div>
@@ -190,34 +201,42 @@
         </section>
     </main>
 
-    <script>
-        window.onload = function() {
-            // Check if Stage 1 is complete
-            if (localStorage.getItem('challenge1_complete') === 'true') {
-                // Update Scores
-                document.getElementById('total-points').innerText = "300";
-                document.getElementById('current-xp').innerText = "300";
-                document.getElementById('xp-bar').style.width = "60%";
-                document.getElementById('badge-count').innerText = "1";
-                
-                // Unlock Stage 2
-                const s2 = document.getElementById('challenge-2');
-                s2.classList.remove('locked-state');
-                s2.classList.add('active-card');
-                const btn = s2.querySelector('button');
-                btn.removeAttribute('disabled');
-                btn.className = "w-full bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-lg";
-                btn.innerText = "Start Stage";
+   <script>
+    window.onload = function() {
+        // --- 1. Load Learner Name ---
+        const learner = localStorage.getItem("learnerName");
+        if (learner) {
+            // This updates the "Yoga Learner" text with the actual name
+            document.getElementById("learnerDisplay").textContent = learner;
+        }
 
-                // Show Badge Reward
-                const badgeBox = document.getElementById('badges-container').children[0];
-                badgeBox.classList.remove('opacity-30', 'grayscale');
-                badgeBox.classList.add('badge-unlock');
-                badgeBox.querySelector('div').classList.remove('border-dashed', 'border-gray-300');
-                badgeBox.querySelector('div').classList.add('border-solid', 'border-green-500', 'bg-green-50');
-                badgeBox.querySelector('p').classList.replace('text-gray-400', 'text-green-700');
-            }
-        };
-    </script>
+        // --- 2. Your Existing Stage Completion Logic ---
+        if (localStorage.getItem('challenge1_complete') === 'true') {
+            // Update Scores
+            document.getElementById('total-points').innerText = "300";
+            document.getElementById('current-xp').innerText = "300";
+            document.getElementById('xp-bar').style.width = "60%";
+            document.getElementById('badge-count').innerText = "1";
+            
+            // Unlock Stage 2
+            const s2 = document.getElementById('challenge-2');
+            s2.classList.remove('locked-state');
+            s2.classList.add('active-card');
+            const btn = s2.querySelector('button');
+            btn.removeAttribute('disabled');
+            btn.className = "w-full bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-lg";
+            btn.innerText = "Start Stage";
+
+            // Show Badge Reward
+            const badgeBox = document.getElementById('badges-container').children[0];
+            badgeBox.classList.remove('opacity-30', 'grayscale');
+            badgeBox.classList.add('badge-unlock');
+            badgeBox.querySelector('div').classList.remove('border-dashed', 'border-gray-300');
+            badgeBox.querySelector('div').classList.add('border-solid', 'border-green-500', 'bg-green-50');
+            badgeBox.querySelector('p').classList.replace('text-gray-400', 'text-green-700');
+        }
+    };
+</script>
 </body>
+
 </html>
