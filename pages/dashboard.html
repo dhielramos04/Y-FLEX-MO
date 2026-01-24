@@ -96,7 +96,7 @@
         </div>
 
         <nav class="flex-grow">
-            <a href="dashboard.html" class="nav-item active">
+            <a href="dashboard.html" class="nav-item">
                 <span class="mr-3">🏠</span> Dashboard
             </a>
             <a href="challenge_list.html" class="nav-item">
@@ -333,9 +333,26 @@ const totalPoints = s1Points + s2Points + s3Points;
         }
     }
 </script>
+    
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+    const currentPage = window.location.pathname.split("/").pop();
+
+    document.querySelectorAll(".nav-item").forEach(link => {
+        const linkPage = link.getAttribute("href");
+
+        if (linkPage === currentPage) {
+            link.classList.add("active");
+        } else {
+            link.classList.remove("active");
+        }
+    });
+});
+</script>
 </body>
 
 </html>
+
 
 
 
