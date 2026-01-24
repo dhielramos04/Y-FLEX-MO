@@ -57,6 +57,18 @@
             40% {transform: translateY(-10px);}
             60% {transform: translateY(-5px);}
         }
+        /* MOBILE RESPONSIVENESS FIX */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 20px;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -352,6 +364,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </body>
 
 </html>
+
 
 
 
