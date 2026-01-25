@@ -60,7 +60,14 @@
         /* MOBILE RESPONSIVENESS FIX */
 @media (max-width: 768px) {
     .sidebar {
-        display: none;
+        position: fixed;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 50;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
     }
 
     .main-content {
@@ -129,6 +136,11 @@
     </aside>
 
     <main class="main-content">
+        <button id="menuToggle"
+        class="md:hidden mb-4 p-2 rounded-lg border border-green-200 text-green-700">
+    ☰ Menu
+</button>
+
         <div class="flex justify-between items-start mb-12">
             <header>
                 <h1 class="text-4xl font-black text-green-900 tracking-tight">Yoga Journey</h1>
@@ -361,9 +373,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 </script>
+    <script>
+document.getElementById("menuToggle")?.addEventListener("click", () => {
+    document.querySelector(".sidebar")?.classList.toggle("open");
+});
+</script>
 </body>
 
 </html>
+
 
 
 
