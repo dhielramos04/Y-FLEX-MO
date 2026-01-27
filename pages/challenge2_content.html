@@ -27,15 +27,16 @@
         }
 
         .video-container {
-            position: relative;
-            width: 100%;
-            padding-bottom: 56.25%;
-            height: 0;
-            background: #022c22;
-            border-radius: 1.5rem 1.5rem 0 0;
-        }
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    height: 0;
+    background: #022c22;
+    border-radius: 1.5rem 1.5rem 0 0;
+    overflow: hidden; /* ← THIS is what you were missing */
+}
 
-        .video-container video {
+.video-container video {
     position: absolute;
     top: 0;
     left: 0;
@@ -43,6 +44,7 @@
     height: 100%;
     object-fit: contain;
 }
+
 
         .option-btn {
             border: 2px solid #bbf7d0;
@@ -325,6 +327,7 @@
 
 </body>
 </html>
+
 
 
 
