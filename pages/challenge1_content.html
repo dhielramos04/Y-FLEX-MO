@@ -109,111 +109,137 @@
         </section>
     </main>
 
-    <script>
-    const quizData = [
-        {
-            question: "What is the fundamental purpose of yoga?",
-            options: ["To build muscle mass only", "To promote harmony of body, mind, and environment", "To serve as a competitive sport", "To replace medical treatment"],
-            answer: "To promote harmony of body, mind, and environment"
-        },
-        {
-            question: "Which yoga style is most suitable for beginners due to its gentle and slow-paced nature?",
-            options: ["Vinyasa Yoga", "Ashtanga Yoga", "Hatha Yoga", "Power Yoga"],
-            answer: "Hatha Yoga"
-        },
-        {
-            question: "Which type of yoga follows a fixed and structured sequence of postures synchronized with breathing?",
-            options: ["Hatha Yoga", "Vinyasa Yoga", "Ashtanga Yoga", "Restorative Yoga"],
-            answer: "Ashtanga Yoga"
-        },
-        {
-            question: "In Vinyasa Yoga, how should movements be performed?",
-            options: ["Independently from breathing", "In long static holds", "In a flowing sequence synchronized with the breath", "Only while seated"],
-            answer: "In a flowing sequence synchronized with the breath"
-        },
-        {
-            question: "Which of the following is a documented benefit of regular yoga practice?",
-            options: ["Increased stress hormone levels", "Reduced flexibility", "Improved strength, balance, and mental clarity", "Sleep disruption"],
-            answer: "Improved strength, balance, and mental clarity"
-        }
-    ];
+<script>
+const quizData = [
+    {
+        question: "What is the fundamental purpose of yoga?",
+        options: [
+            "To build muscle mass only",
+            "To promote harmony of body, mind, and environment",
+            "To serve as a competitive sport",
+            "To replace medical treatment"
+        ],
+        answer: "To promote harmony of body, mind, and environment"
+    },
+    {
+        question: "Which yoga style is most suitable for beginners due to its gentle and slow-paced nature?",
+        options: ["Vinyasa Yoga", "Ashtanga Yoga", "Hatha Yoga", "Power Yoga"],
+        answer: "Hatha Yoga"
+    },
+    {
+        question: "Which type of yoga follows a fixed and structured sequence of postures synchronized with breathing?",
+        options: ["Hatha Yoga", "Vinyasa Yoga", "Ashtanga Yoga", "Restorative Yoga"],
+        answer: "Ashtanga Yoga"
+    },
+    {
+        question: "In Vinyasa Yoga, how should movements be performed?",
+        options: [
+            "Independently from breathing",
+            "In long static holds",
+            "In a flowing sequence synchronized with the breath",
+            "Only while seated"
+        ],
+        answer: "In a flowing sequence synchronized with the breath"
+    },
+    {
+        question: "Which of the following is a documented benefit of regular yoga practice?",
+        options: [
+            "Increased stress hormone levels",
+            "Reduced flexibility",
+            "Improved strength, balance, and mental clarity",
+            "Sleep disruption"
+        ],
+        answer: "Improved strength, balance, and mental clarity"
+    }
+];
 
-    // --- NEW VARIABLES ---
-    let userScores = new Array(quizData.length).fill(false);
-    let answeredQuestions = new Set(); // Tracks which questions were clicked
-    let correctCount = 0; // Tracks total correct answers
+// --- MATCHING CHALLENGE 2 LOGIC ---
+let answeredQuestions = new Set();
+let answeredCorrectly = new Set();
+const totalQuestions = quizData.length;
 
-    function initQuiz() {
-        const container = document.getElementById('quiz-container');
-        container.innerHTML = quizData.map((q, qIdx) => `
-            <div class="bg-white p-8 rounded-3xl border border-green-100 shadow-sm">
-                <h3 class="font-bold text-lg mb-6 text-green-900">${qIdx + 1}. ${q.question}</h3>
-                <div class="grid grid-cols-1 gap-3">
-                    ${q.options.map(opt => `
-                        <button onclick="checkAnswer(this, ${qIdx}, '${opt.replace(/'/g, "\\'")}')" 
-                                class="option-btn p-4 rounded-xl text-left font-medium text-gray-700">
-                            ${opt}
-                        </button>
-                    `).join('')}
-                </div>
+function initQuiz() {
+    const container = document.getElementById("quiz-container");
+    container.innerHTML = "";
+
+    quizData.forEach((q, index) => {
+        const div = document.createElement("div");
+        div.className = "bg-white p-8 rounded-3xl border border-green-100 shadow-sm quiz-item";
+
+        div.innerHTML = `
+            <h3 class="font-bold text-lg mb-6 text-green-900">
+                ${index + 1}. ${q.question}
+            </h3>
+            <div class="grid gap-3">
+                ${q.options.map(opt => `
+                    <button class="option-btn p-4 rounded-xl text-left font-medium text-gray-700"
+                        onclick="checkAnswer(this, ${index}, '${opt.replace(/'/g, "\\'")}')">
+                        ${opt}
+                    </button>
+                `).join("")}
             </div>
-        `).join('');
-    }
-
-    function checkAnswer(btn, qIdx, selected) {
-        const isCorrect = selected === quizData[qIdx].answer;
-        const buttons = btn.parentElement.querySelectorAll('.option-btn');
-        
-        buttons.forEach(b => b.classList.remove('selected', 'correct', 'wrong'));
-
-        // Logic to track the score correctly even if they change their mind
-        if (isCorrect) {
-            btn.classList.add('correct');
-            if (!userScores[qIdx]) correctCount++; 
-            userScores[qIdx] = true;
-        } else {
-            btn.classList.add('wrong');
-            if (userScores[qIdx]) correctCount--; 
-            userScores[qIdx] = false;
-        }
-
-        // Mark question as attempted
-        answeredQuestions.add(qIdx);
-
-        // --- CHANGE: Show results after all 5 questions are attempted ---
-        if (answeredQuestions.size === quizData.length) {
-            document.getElementById('final-score').innerText = correctCount;
-            document.getElementById('completion-zone').classList.remove('hidden');
-            document.getElementById('completion-zone').scrollIntoView({ behavior: 'smooth' });
-        }
-    }
-
-  function finishChallenge() {
-    // 1. Calculate points: 40 points per correct answer (5 correct = 200 YP)
-    const pointsPerQuestion = 40; 
-    const totalPointsEarned = correctCount * pointsPerQuestion; 
-
-    // 2. SAVE TO LOCAL STORAGE
-    // Use 'challenge1_points' so the dashboard can find it
-    localStorage.setItem('challenge1_points', totalPointsEarned); 
-    
-    // Save completion status and score for badges
-    localStorage.setItem('challenge1_complete', 'true');
-    localStorage.setItem('challenge1_score', correctCount); 
-    
-    // 3. Redirect back to dashboard
-    window.location.href = "dashboard.html"; 
+        `;
+        container.appendChild(div);
+    });
 }
-  window.onload = function() {
+
+function checkAnswer(btn, questionIndex, selectedAnswer) {
+    const parent = btn.closest(".quiz-item");
+    const buttons = parent.querySelectorAll(".option-btn");
+
+    // Reset visuals
+    buttons.forEach(b => b.classList.remove("correct", "wrong"));
+
+    // Mark attempted
+    answeredQuestions.add(questionIndex);
+
+    if (selectedAnswer === quizData[questionIndex].answer) {
+        btn.classList.add("correct");
+        answeredCorrectly.add(questionIndex);
+    } else {
+        btn.classList.add("wrong");
+        answeredCorrectly.delete(questionIndex);
+
+        // Show correct answer (learning feedback)
+        buttons.forEach(b => {
+            if (b.textContent.trim() === quizData[questionIndex].answer) {
+                b.classList.add("correct");
+            }
+        });
+    }
+
+    // Show completion zone once all are attempted
+    if (answeredQuestions.size === totalQuestions) {
+        document.getElementById("final-score").textContent = answeredCorrectly.size;
+        const zone = document.getElementById("completion-zone");
+        zone.classList.remove("hidden");
+        zone.scrollIntoView({ behavior: "smooth" });
+    }
+}
+
+function finishChallenge() {
+    const finalScore = answeredCorrectly.size;
+    const pointsEarned = finalScore * 40; // 200 max
+
+    localStorage.setItem("challenge1_complete", "true");
+    localStorage.setItem("challenge1_score", finalScore);
+    localStorage.setItem("challenge1_points", pointsEarned);
+
+    window.location.href = "dashboard.html";
+}
+
+window.onload = () => {
     initQuiz();
-    const learner = localStorage.getItem("learnerName"); 
+    const learner = localStorage.getItem("learnerName");
     if (learner) {
         document.getElementById("learnerDisplay").textContent = learner;
     }
 };
 </script>
+
 </body>
 </html>
+
 
 
 
