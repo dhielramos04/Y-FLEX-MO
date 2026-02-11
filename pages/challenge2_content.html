@@ -246,13 +246,23 @@
             <button onclick="check(this, false)" class="option-btn text-green-900">Behind the body</button>
         </div>
 
+   <div id="completion-zone" class="mt-12 text-center hidden">
+
+    <!-- SCORE DISPLAY (added above badge section) -->
+    <div class="mb-6 font-bold text-lg">
+        Raw Score: <span id="raw-score">0</span> / 5
+        <br>
+        Points Earned: <span id="weighted-score">0</span> / 30
     </div>
 
-    <div id="completion-zone" class="mt-12 text-center hidden">
-        <button onclick="completeChallenge()" class="bg-green-500 hover:bg-green-600 px-12 py-4 rounded-2xl font-black text-xl">
-            Complete Challenge 2
-        </button>
-    </div>
+    <!-- Badge & Completion Button (keep as-is) -->
+    <p class="text-green-800 mb-6 font-medium">
+        You've earned the Yoga Master Badge and XP!
+    </p>
+    <button onclick="completeChallenge()" class="bg-green-500 hover:bg-green-600 px-12 py-4 rounded-2xl font-black text-xl">
+        Complete Challenge 2
+    </button>
+</div>
 </section>
 
 </main>
@@ -296,17 +306,30 @@
 
         // SHOW COMPLETION BUTTON:
         // Now it shows as long as every question has been answered once
-        if (answeredQuestions.size === totalQuestions) {
-            document.getElementById('completion-zone').classList.remove('hidden');
-            document.getElementById('completion-zone').scrollIntoView({ behavior: 'smooth' });
-        }
-    }
+      if (answeredQuestions.size === totalQuestions) {
+
+    const rawScore = answeredCorrectly.size;   // e.g. 4
+    const stageWeight = 30;                   // Stage 2 = 30 max
+    const weightedScore = (rawScore / totalQuestions) * stageWeight;
+
+    document.getElementById('raw-score').textContent = rawScore;
+    document.getElementById('weighted-score').textContent = weightedScore.toFixed(2);
+
+    // Save for dashboard total computation
+    localStorage.setItem('stage2_raw', rawScore);
+    localStorage.setItem('stage2_points', weightedScore);
+
+    document.getElementById('completion-zone').classList.remove('hidden');
+    document.getElementById('completion-zone').scrollIntoView({ behavior: 'smooth' });
+}
+
 
     function completeChallenge() {
-        const finalScore = answeredCorrectly.size;
-        
-        // Points logic based on actual correct answers
-        const rewardPoints = (finalScore / totalQuestions) * 100;
+    const finalScore = answeredCorrectly.size;
+    
+    // Points logic for Stage 2 (max 30)
+    const stageWeight = 30;
+    const rewardPoints = (finalScore / totalQuestions) * stageWeight;
         
         // --- SAVE TO LOCALSTORAGE ---
         localStorage.setItem('challenge2_complete', 'true');
@@ -327,6 +350,7 @@
 
 </body>
 </html>
+
 
 
 
