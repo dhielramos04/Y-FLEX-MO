@@ -275,8 +275,9 @@ if (s1Complete) {
     const btn1 = s1.querySelector('a, button');
     if (btn1) {
         btn1.innerText = "✅ Completed";
-        btn1.className = "w-full bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold text-center cursor-default";
-        btn1.onclick = null;
+        btn1.className = "w-full bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold text-center hover:bg-gray-200 transition";
+        // Make it go back to dashboard
+        btn1.onclick = () => window.location.href = "dashboard.html";
         if (btn1.tagName === "A") btn1.href = "javascript:void(0)";
     }
     unlockStage('challenge-2', 'challenge2_content.html');
@@ -289,8 +290,8 @@ if (s2Complete) {
     const btn2 = s2.querySelector('a, button');
     if (btn2) {
         btn2.innerText = "✅ Completed";
-        btn2.className = "w-full bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold cursor-default";
-        btn2.onclick = null;
+        btn2.className = "w-full bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold text-center hover:bg-gray-200 transition";
+        btn2.onclick = () => window.location.href = "dashboard.html";
         if (btn2.tagName === "A") btn2.href = "javascript:void(0)";
     }
     unlockStage('challenge-3', 'challenge3_content.html');
@@ -303,8 +304,8 @@ if (s3Complete) {
     const btn3 = s3.querySelector('a, button');
     if (btn3) {
         btn3.innerText = "✅ Completed";
-        btn3.className = "w-full bg-black text-white py-4 rounded-2xl font-bold cursor-default";
-        btn3.onclick = null;
+        btn3.className = "w-full bg-black text-white py-4 rounded-2xl font-bold hover:bg-green-900 transition";
+        btn3.onclick = () => window.location.href = "dashboard.html";
         if (btn3.tagName === "A") btn3.href = "javascript:void(0)";
     }
     unlockBadge(2, Number(localStorage.getItem('challenge3_score')));
@@ -393,6 +394,7 @@ document.getElementById("menuToggle")?.addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
