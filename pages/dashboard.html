@@ -268,24 +268,49 @@
     if (s3Complete) badgeCount++;
     document.getElementById('badge-count').innerText = badgeCount;
 
-    // --- 7. Update Stage Cards & Unlock Progression ---
-    if (s1Complete) {
-        markStageComplete('challenge-1', s1Points);
-        unlockStage('challenge-2', 'challenge2_content.html');
-        unlockBadge(0, Number(localStorage.getItem('challenge1_score')));
+ // --- 7. Update Stage Cards & Unlock Progression (Fixed) ---
+if (s1Complete) {
+    const s1 = document.getElementById('challenge-1');
+    markStageComplete('challenge-1', s1Points);
+    const btn1 = s1.querySelector('a, button');
+    if (btn1) {
+        btn1.innerText = "✅ Completed";
+        btn1.className = "w-full bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold text-center cursor-default";
+        btn1.onclick = null;
+        if (btn1.tagName === "A") btn1.href = "javascript:void(0)";
     }
+    unlockStage('challenge-2', 'challenge2_content.html');
+    unlockBadge(0, Number(localStorage.getItem('challenge1_score')));
+}
 
-    if (s2Complete) {
-        markStageComplete('challenge-2', s2Points);
-        unlockStage('challenge-3', 'challenge3_content.html');
-        unlockBadge(1, Number(localStorage.getItem('challenge2_score')));
+if (s2Complete) {
+    const s2 = document.getElementById('challenge-2');
+    markStageComplete('challenge-2', s2Points);
+    const btn2 = s2.querySelector('a, button');
+    if (btn2) {
+        btn2.innerText = "✅ Completed";
+        btn2.className = "w-full bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold cursor-default";
+        btn2.onclick = null;
+        if (btn2.tagName === "A") btn2.href = "javascript:void(0)";
     }
+    unlockStage('challenge-3', 'challenge3_content.html');
+    unlockBadge(1, Number(localStorage.getItem('challenge2_score')));
+}
 
-    if (s3Complete) {
-        markStageComplete('challenge-3', s3Points, true);
-        unlockBadge(2, Number(localStorage.getItem('challenge3_score')));
-        if (userLevelText) userLevelText.innerText = "Master";
+if (s3Complete) {
+    const s3 = document.getElementById('challenge-3');
+    markStageComplete('challenge-3', s3Points, true);
+    const btn3 = s3.querySelector('a, button');
+    if (btn3) {
+        btn3.innerText = "✅ Completed";
+        btn3.className = "w-full bg-black text-white py-4 rounded-2xl font-bold cursor-default";
+        btn3.onclick = null;
+        if (btn3.tagName === "A") btn3.href = "javascript:void(0)";
     }
+    unlockBadge(2, Number(localStorage.getItem('challenge3_score')));
+    if (userLevelText) userLevelText.innerText = "Master";
+}
+
 
     // --- HELPER FUNCTIONS ---
     function markStageComplete(stageId, points, isFinal=false) {
@@ -368,6 +393,7 @@ document.getElementById("menuToggle")?.addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
