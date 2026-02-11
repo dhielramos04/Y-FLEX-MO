@@ -295,8 +295,7 @@
             btn.classList.add('incorrect');
             answeredCorrectly.delete(questionIndex);
             
-            // Optional: Show the user which one was actually correct
-            // This helps them learn even if they get it wrong
+            // Show the correct button
             buttons.forEach(b => {
                 if (b.getAttribute('onclick').includes('true')) {
                     b.classList.add('correct');
@@ -305,43 +304,40 @@
         }
 
         // SHOW COMPLETION BUTTON:
-        // Now it shows as long as every question has been answered once
-      if (answeredQuestions.size === totalQuestions) {
+        if (answeredQuestions.size === totalQuestions) {
+            const rawScore = answeredCorrectly.size;   // e.g. 4
+            const stageWeight = 30;                   // Stage 2 = 30 max
+            const weightedScore = (rawScore / totalQuestions) * stageWeight;
 
-    const rawScore = answeredCorrectly.size;   // e.g. 4
-    const stageWeight = 30;                   // Stage 2 = 30 max
-    const weightedScore = (rawScore / totalQuestions) * stageWeight;
+            document.getElementById('raw-score').textContent = rawScore;
+            document.getElementById('weighted-score').textContent = weightedScore.toFixed(2);
 
-    document.getElementById('raw-score').textContent = rawScore;
-    document.getElementById('weighted-score').textContent = weightedScore.toFixed(2);
+            // Save for dashboard
+            localStorage.setItem('stage2_raw', rawScore);
+            localStorage.setItem('stage2_points', weightedScore);
 
-    // Save for dashboard total computation
-    localStorage.setItem('stage2_raw', rawScore);
-    localStorage.setItem('stage2_points', weightedScore);
+            document.getElementById('completion-zone').classList.remove('hidden');
+            document.getElementById('completion-zone').scrollIntoView({ behavior: 'smooth' });
+        }
+    } // ← Make sure this closing brace is here!
 
-    document.getElementById('completion-zone').classList.remove('hidden');
-    document.getElementById('completion-zone').scrollIntoView({ behavior: 'smooth' });
-}
-
-
+    // COMPLETE CHALLENGE FUNCTION (now properly global)
     function completeChallenge() {
-    const finalScore = answeredCorrectly.size;
-    
-    // Points logic for Stage 2 (max 30)
-    const stageWeight = 30;
-    const rewardPoints = (finalScore / totalQuestions) * stageWeight;
+        const finalScore = answeredCorrectly.size;
+        const stageWeight = 30;
+        const rewardPoints = (finalScore / totalQuestions) * stageWeight;
         
-        // --- SAVE TO LOCALSTORAGE ---
+        // Save to localStorage
         localStorage.setItem('challenge2_complete', 'true');
-        localStorage.setItem('challenge2_score', finalScore);     // Still used for Badge Color
-        localStorage.setItem('challenge2_points', rewardPoints);   // Still used for XP Bar
+        localStorage.setItem('challenge2_score', finalScore);
+        localStorage.setItem('challenge2_points', rewardPoints);
         
         // Rank Feedback
         let rank = "Bronze (Trainee)";
         if (finalScore === 5) rank = "Gold (Master)";
         else if (finalScore >= 3) rank = "Silver (Practitioner)";
 
-        alert(`Challenge 2 Finished!\nYour Score: ${finalScore}/5\nEarned Rank: ${rank}\nXP Points: ${rewardPoints}`);
+        alert(`Challenge 2 Finished!\nYour Score: ${finalScore}/5\nEarned Rank: ${rank}\nXP Points: ${rewardPoints.toFixed(2)}`);
         
         // Redirect to dashboard
         window.location.href = "dashboard.html"; 
@@ -350,6 +346,7 @@
 
 </body>
 </html>
+
 
 
 
