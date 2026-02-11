@@ -80,24 +80,34 @@
         </div>
     </div>
 
-    <script>
-        // Check if Challenge 1 is complete to unlock Stage 2
-        window.onload = function() {
-            if (localStorage.getItem('challenge1_complete') === 'true') {
-                const stage2 = document.getElementById('challenge-2');
-                stage2.classList.remove('locked-state');
-                stage2.classList.add('active-card');
-                stage2.style.borderTop = "4px solid #22c55e"; // Green accent for unlocked
-                
-                const btn = stage2.querySelector('button');
-                btn.removeAttribute('disabled');
-                btn.classList.remove('bg-gray-200', 'text-gray-500', 'cursor-not-allowed');
-                btn.classList.add('bg-green-600', 'text-white', 'hover:bg-green-700', 'shadow-lg', 'shadow-green-100');
-                btn.innerText = "Start Challenge";
-                btn.onclick = function() { window.location.href = 'challenge2_content.html'; };
-            }
-        };
-    </script>
+<script>
+    window.onload = function() {
+        // Unlock Stage 2 if Challenge 1 is complete
+        if (localStorage.getItem('challenge1_complete') === 'true') {
+            const stage2 = document.getElementById('challenge-2');
+            unlockChallenge(stage2, 'challenge2_content.html');
+        }
+
+        // Unlock Stage 3 if Challenge 2 is complete
+        if (localStorage.getItem('challenge2_complete') === 'true') {
+            const stage3 = document.getElementById('challenge-3');
+            unlockChallenge(stage3, 'challenge3_content.html');
+        }
+    };
+
+    function unlockChallenge(challengeCard, url) {
+        challengeCard.classList.remove('locked-state');
+        challengeCard.classList.add('active-card');
+        challengeCard.style.borderTop = "4px solid #22c55e";
+
+        const btn = challengeCard.querySelector('button');
+        btn.removeAttribute('disabled');
+        btn.className = "w-full bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 shadow-lg shadow-green-100";
+        btn.innerText = "Start Challenge";
+        btn.onclick = () => window.location.href = url;
+    }
+</script>
 
 </body>
+
 </html>
