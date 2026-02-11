@@ -314,36 +314,26 @@ if (s3Complete) {
 
 
     // --- HELPER FUNCTIONS ---
-    function markStageComplete(stageId, points, isFinal=false) {
-        const stage = document.getElementById(stageId);
-        if (!stage) return;
-        const btn = stage.querySelector('button, a');
-        if (!btn) return;
+   function markStageComplete(stageId, points, isFinal=false) {
+    const stage = document.getElementById(stageId);
+    if (!stage) return;
+    const btn = stage.querySelector('button, a');
+    if (!btn) return;
 
-        btn.innerText = "✅ Completed";
-        btn.className = isFinal 
-            ? "w-full bg-black text-white py-4 rounded-2xl font-bold cursor-default"
-            : "w-full bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold text-center cursor-default";
+    btn.innerText = "✅ Completed";
+    btn.className = isFinal 
+        ? "w-full bg-black text-white py-4 rounded-2xl font-bold hover:bg-green-900 transition"
+        : "w-full bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold text-center hover:bg-gray-200 transition";
+    
+    // Only remove onclick if isFinal is true, otherwise keep it pointing to dashboard
+    if (isFinal) {
         btn.onclick = null;
-    }
-
-    function unlockStage(elementId, destinationFile) {
-        const card = document.getElementById(elementId);
-        if (!card) return;
-
-        card.classList.remove('locked-state');
-        card.classList.add('active-card');
-
-        const btn = card.querySelector('button, a');
-        if (!btn) return;
-
-        btn.removeAttribute('disabled');
-        btn.className = "w-full bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-lg cursor-pointer";
-        btn.innerText = "Start Stage";
-        btn.onclick = () => window.location.href = destinationFile;
-
+        if (btn.tagName === "A") btn.href = "javascript:void(0)";
+    } else {
+        btn.onclick = () => window.location.href = "dashboard.html";
         if (btn.tagName === "A") btn.href = "javascript:void(0)";
     }
+}
 
     function unlockBadge(index, score) {
         const container = document.getElementById('badges-container');
@@ -394,6 +384,7 @@ document.getElementById("menuToggle")?.addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
