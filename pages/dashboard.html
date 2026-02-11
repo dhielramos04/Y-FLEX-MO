@@ -226,111 +226,98 @@
     </main>
 
   <script>
-    window.onload = function() {
-        // --- 1. Load Learner Name ---
-        const learner = localStorage.getItem("learnerName");
-        if (learner) {
-            document.getElementById("learnerDisplay").textContent = learner;
-        }
-
-       // --- 2. GET ALL SAVED DATA (SAFE VERSION) ---
-const s1Points = Number(localStorage.getItem('challenge1_points') ?? 0);
-const s2Points = Number(localStorage.getItem('challenge2_points') ?? 0);
-const s3Points = Number(localStorage.getItem('challenge3_points') ?? 0);
-
-const s1Complete = localStorage.getItem('challenge1_complete') === 'true';
-const s2Complete = localStorage.getItem('challenge2_complete') === 'true';
-const s3Complete = localStorage.getItem('challenge3_complete') === 'true';
-
-// --- 3. CALCULATE TOTALS ---
-const totalPoints = s1Points + s2Points + s3Points;
-
-        // >>> START OF RANK LOGIC INSERTION <<<
-        const userLevelText = document.getElementById('user-level');
-        if (userLevelText) {
-            if (totalPoints >= 800) {
-                userLevelText.innerText = "Master";
-            } else if (totalPoints >= 400) {
-                userLevelText.innerText = "Intermediate";
-            } else {
-                userLevelText.innerText = "Beginner";
-            }
-        }
-        // >>> END OF RANK LOGIC INSERTION <<<
-        
-        let badgeCount = 0;
-        if (s1Complete) badgeCount++;
-        if (s2Complete) badgeCount++;
-        if (s3Complete) badgeCount++;
-
-        // Update UI Displays
-        document.getElementById('total-points').innerText = totalPoints;
-        document.getElementById('current-xp').innerText = totalPoints;
-        document.getElementById('badge-count').innerText = badgeCount;
-
-        // Calculate XP Bar (Target 1000 YP for Level 1)
-        let xpPercent = Math.min((totalPoints / 1000) * 100, 100);
-        document.getElementById('xp-bar').style.width = xpPercent + "%";
-
-        // --- 4. PROGRESSION & BADGE LOGIC ---
-        // (Keep the rest of your stage completion logic here as it was)
-        if (s1Complete) {
-            const s1 = document.getElementById('challenge-1');
-            const btn1 = s1.querySelector('a');
-            if(btn1) {
-                btn1.innerText = "✅ Completed";
-                btn1.className = "w-full bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold text-center cursor-default";
-                btn1.href = "javascript:void(0)";
-            }
-            unlockStage('challenge-2', 'challenge2_content.html');
-            unlockBadge(0, localStorage.getItem('challenge1_score'));
-        }
-
-        if (s2Complete) {
-            const s2 = document.getElementById('challenge-2');
-            const btn2 = s2.querySelector('button');
-            btn2.innerText = "✅ Completed";
-            btn2.className = "w-full bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold cursor-default";
-            unlockStage('challenge-3', 'challenge3_content.html');
-            unlockBadge(1, localStorage.getItem('challenge2_score'));
-        }
-
-        if (s3Complete) {
-            // Note: This overrides the logic above if they finish Stage 3
-            if (userLevelText) userLevelText.innerText = "Master"; 
-            unlockBadge(2, 5);
-            const s3 = document.getElementById('challenge-3');
-            const btn3 = s3.querySelector('button');
-            btn3.innerText = "✅ Completed";
-            btn3.className = "w-full bg-black text-white py-4 rounded-2xl font-bold cursor-default";
-            btn3.onclick = null;
-        }
-    };
-
-    // (Keep your helper functions unlockStage and unlockBadge below)
-      // --- HELPER FUNCTIONS ---
-
-  function unlockStage(elementId, destinationFile) {
-    const card = document.getElementById(elementId);
-    if (!card) return;
-
-    card.classList.remove('locked-state');
-    card.classList.add('active-card');
-
-    // Support BOTH <a> and <button>
-    let btn = card.querySelector('button, a');
-    if (!btn) return;
-
-    btn.removeAttribute('disabled');
-    btn.className = "w-full bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-lg cursor-pointer";
-    btn.innerText = "Start Stage";
-    btn.onclick = () => window.location.href = destinationFile;
-
-    // If it was an <a>, neutralize href conflicts
-    if (btn.tagName === "A") {
-        btn.href = "javascript:void(0)";
+   window.onload = function() {
+    // --- 1. Load Learner Name ---
+    const learner = localStorage.getItem("learnerName");
+    if (learner) {
+        document.getElementById("learnerDisplay").textContent = learner;
     }
-}
+
+    // --- 2. Load Stage Points & Completion ---
+    const s1Points = Number(localStorage.getItem('challenge1_points') ?? 0);
+    const s2Points = Number(localStorage.getItem('challenge2_points') ?? 0);
+    const s3Points = Number(localStorage.getItem('challenge3_points') ?? 0);
+
+    const s1Complete = localStorage.getItem('challenge1_complete') === 'true';
+    const s2Complete = localStorage.getItem('challenge2_complete') === 'true';
+    const s3Complete = localStorage.getItem('challenge3_complete') === 'true';
+
+    // --- 3. Compute Total Points ---
+    const totalPoints = s1Points + s2Points + s3Points;
+    document.getElementById('total-points').innerText = totalPoints;
+    document.getElementById('current-xp').innerText = totalPoints;
+
+    // --- 4. Update XP Bar ---
+    let xpPercent = Math.min((totalPoints / 100) * 100, 100);
+    document.getElementById('xp-bar').style.width = xpPercent + "%";
+
+    // --- 5. Determine User Level ---
+    const userLevelText = document.getElementById('user-level');
+    if (totalPoints >= 90) {
+        userLevelText.innerText = "Master";
+    } else if (totalPoints >= 50) {
+        userLevelText.innerText = "Intermediate";
+    } else {
+        userLevelText.innerText = "Beginner";
+    }
+
+    // --- 6. Count Completed Stages for Badges ---
+    let badgeCount = 0;
+    if (s1Complete) badgeCount++;
+    if (s2Complete) badgeCount++;
+    if (s3Complete) badgeCount++;
+    document.getElementById('badge-count').innerText = badgeCount;
+
+    // --- 7. Update Stage Cards & Unlock Progression ---
+    if (s1Complete) {
+        markStageComplete('challenge-1', s1Points);
+        unlockStage('challenge-2', 'challenge2_content.html');
+        unlockBadge(0, Number(localStorage.getItem('challenge1_score')));
+    }
+
+    if (s2Complete) {
+        markStageComplete('challenge-2', s2Points);
+        unlockStage('challenge-3', 'challenge3_content.html');
+        unlockBadge(1, Number(localStorage.getItem('challenge2_score')));
+    }
+
+    if (s3Complete) {
+        markStageComplete('challenge-3', s3Points, true);
+        unlockBadge(2, Number(localStorage.getItem('challenge3_score')));
+        if (userLevelText) userLevelText.innerText = "Master";
+    }
+
+    // --- HELPER FUNCTIONS ---
+    function markStageComplete(stageId, points, isFinal=false) {
+        const stage = document.getElementById(stageId);
+        if (!stage) return;
+        const btn = stage.querySelector('button, a');
+        if (!btn) return;
+
+        btn.innerText = "✅ Completed";
+        btn.className = isFinal 
+            ? "w-full bg-black text-white py-4 rounded-2xl font-bold cursor-default"
+            : "w-full bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold text-center cursor-default";
+        btn.onclick = null;
+    }
+
+    function unlockStage(elementId, destinationFile) {
+        const card = document.getElementById(elementId);
+        if (!card) return;
+
+        card.classList.remove('locked-state');
+        card.classList.add('active-card');
+
+        const btn = card.querySelector('button, a');
+        if (!btn) return;
+
+        btn.removeAttribute('disabled');
+        btn.className = "w-full bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-lg cursor-pointer";
+        btn.innerText = "Start Stage";
+        btn.onclick = () => window.location.href = destinationFile;
+
+        if (btn.tagName === "A") btn.href = "javascript:void(0)";
+    }
 
     function unlockBadge(index, score) {
         const container = document.getElementById('badges-container');
@@ -344,7 +331,6 @@ const totalPoints = s1Points + s2Points + s3Points;
         badgeIcon.classList.remove('border-dashed', 'border-gray-300');
         badgeIcon.classList.add('border-solid', 'shadow-sm', 'badge-unlock');
 
-        // Color coding based on quiz performance
         if (score >= 5) {
             badgeIcon.classList.add('border-yellow-400', 'bg-yellow-50');
             badgeText.classList.replace('text-gray-400', 'text-yellow-700');
@@ -356,6 +342,7 @@ const totalPoints = s1Points + s2Points + s3Points;
             badgeText.classList.replace('text-gray-400', 'text-orange-600');
         }
     }
+};
 </script>
     
     <script>
@@ -381,6 +368,7 @@ document.getElementById("menuToggle")?.addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
