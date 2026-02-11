@@ -115,6 +115,7 @@
     </main>
 
 <script>
+// --- Quiz Data ---
 const quizData = [
     {
         question: "What is the fundamental purpose of yoga?",
@@ -158,11 +159,11 @@ const quizData = [
     }
 ];
 
-// --- MATCHING CHALLENGE 2 LOGIC ---
 let answeredQuestions = new Set();
 let answeredCorrectly = new Set();
 const totalQuestions = quizData.length;
 
+// --- Initialize Quiz ---
 function initQuiz() {
     const container = document.getElementById("quiz-container");
     container.innerHTML = "";
@@ -188,14 +189,15 @@ function initQuiz() {
     });
 }
 
+// --- Check Answer ---
 function checkAnswer(btn, questionIndex, selectedAnswer) {
     const parent = btn.closest(".quiz-item");
     const buttons = parent.querySelectorAll(".option-btn");
 
-    // Reset visuals
+    // Reset previous selection visuals
     buttons.forEach(b => b.classList.remove("correct", "wrong"));
 
-    // Mark attempted
+    // Track answered questions
     answeredQuestions.add(questionIndex);
 
     if (selectedAnswer === quizData[questionIndex].answer) {
@@ -205,7 +207,7 @@ function checkAnswer(btn, questionIndex, selectedAnswer) {
         btn.classList.add("wrong");
         answeredCorrectly.delete(questionIndex);
 
-        // Show correct answer (learning feedback)
+        // Show correct answer
         buttons.forEach(b => {
             if (b.textContent.trim() === quizData[questionIndex].answer) {
                 b.classList.add("correct");
@@ -213,42 +215,38 @@ function checkAnswer(btn, questionIndex, selectedAnswer) {
         });
     }
 
-    // Show completion zone once all are attempted
-   if (answeredQuestions.size === totalQuestions) {
+    // Update final scores only after all questions attempted
+    if (answeredQuestions.size === totalQuestions) {
+        const rawScore = answeredCorrectly.size;
+        const stageWeight = 20; // Stage 1 weight toward total 100
+        const percentage = (rawScore / totalQuestions) * 100;
+        const weightedScore = (rawScore / totalQuestions) * stageWeight;
 
-    const rawScore = answeredCorrectly.size;
-    const maxRaw = quizData.length; // 5 questions
-    const stageWeight = 20; // Stage 1 weight toward total 100
+        document.getElementById("final-score").textContent = rawScore;
+        document.getElementById("percentage-score").textContent = percentage.toFixed(0);
+        document.getElementById("weighted-score").textContent = weightedScore.toFixed(2);
 
-    const percentage = (rawScore / maxRaw) * 100;
-    const weightedScore = (rawScore / maxRaw) * stageWeight;
-
-    document.getElementById("final-score").textContent = rawScore;
-    document.getElementById("percentage-score").textContent = percentage.toFixed(0);
-    document.getElementById("weighted-score").textContent = weightedScore.toFixed(2);
-
-    localStorage.setItem("stage1_raw", rawScore);
-    localStorage.setItem("stage1_percentage", percentage);
-    localStorage.setItem("stage1_points", weightedScore);
-
-    const zone = document.getElementById("completion-zone");
-    zone.classList.remove("hidden");
-    zone.scrollIntoView({ behavior: "smooth" });
+        // Save to localStorage for dashboard
+        localStorage.setItem("challenge1_complete", "true");
+        localStorage.setItem("challenge1_score", rawScore);
+        localStorage.setItem("challenge1_points", weightedScore);
+    }
 }
 
-
+// --- Finish Challenge ---
 function finishChallenge() {
-    localStorage.setItem("stage1_complete", "true");
-    window.location.href = "dashboard.html";
-}
+    // Ensure all questions are answered
+    if (answeredQuestions.size < totalQuestions) {
+        alert("Please answer all quiz questions before completing the stage.");
+        return;
+    }
 
+    // Mark stage complete and redirect
     localStorage.setItem("challenge1_complete", "true");
-    localStorage.setItem("challenge1_score", finalScore);
-    localStorage.setItem("challenge1_points", pointsEarned);
-
     window.location.href = "dashboard.html";
 }
 
+// --- On Page Load ---
 window.onload = () => {
     initQuiz();
     const learner = localStorage.getItem("learnerName");
@@ -260,6 +258,7 @@ window.onload = () => {
 
 </body>
 </html>
+
 
 
 
