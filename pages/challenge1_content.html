@@ -97,10 +97,15 @@
 
             <div id="quiz-container" class="space-y-8"></div>
 
-           <div id="completion-zone" class="mt-16 text-center hidden">
-    <div class="bg-green-600 text-white p-6 rounded-2xl mb-6 font-bold shadow-lg">
-        ✨ Stage 1 Attempted! Your Score: <span id="final-score">0</span> / 5
-    </div>
+        <div class="bg-green-600 text-white p-6 rounded-2xl mb-6 font-bold shadow-lg">
+    ✨ Stage 1 Completed!
+    <br>
+    Raw Score: <span id="final-score">0</span> / 5
+    <br>
+    Percentage: <span id="percentage-score">0</span>%
+    <br>
+    Points Earned: <span id="weighted-score">0</span> / 20
+</div>
     <p class="text-green-800 mb-6 font-medium">You've earned the History Buff Badge and +200 YP!</p>
     <button onclick="finishChallenge()" class="bg-green-700 text-white px-12 py-4 rounded-2xl font-bold text-xl hover:bg-green-800 transition shadow-xl">
         Complete Challenge 1
@@ -209,17 +214,33 @@ function checkAnswer(btn, questionIndex, selectedAnswer) {
     }
 
     // Show completion zone once all are attempted
-    if (answeredQuestions.size === totalQuestions) {
-        document.getElementById("final-score").textContent = answeredCorrectly.size;
-        const zone = document.getElementById("completion-zone");
-        zone.classList.remove("hidden");
-        zone.scrollIntoView({ behavior: "smooth" });
-    }
+   if (answeredQuestions.size === totalQuestions) {
+
+    const rawScore = answeredCorrectly.size;
+    const maxRaw = quizData.length; // 5 questions
+    const stageWeight = 20; // Stage 1 weight toward total 100
+
+    const percentage = (rawScore / maxRaw) * 100;
+    const weightedScore = (rawScore / maxRaw) * stageWeight;
+
+    document.getElementById("final-score").textContent = rawScore;
+    document.getElementById("percentage-score").textContent = percentage.toFixed(0);
+    document.getElementById("weighted-score").textContent = weightedScore.toFixed(2);
+
+    localStorage.setItem("stage1_raw", rawScore);
+    localStorage.setItem("stage1_percentage", percentage);
+    localStorage.setItem("stage1_points", weightedScore);
+
+    const zone = document.getElementById("completion-zone");
+    zone.classList.remove("hidden");
+    zone.scrollIntoView({ behavior: "smooth" });
 }
 
+
 function finishChallenge() {
-    const finalScore = answeredCorrectly.size;
-    const pointsEarned = finalScore * 40; // 200 max
+    localStorage.setItem("stage1_complete", "true");
+    window.location.href = "dashboard.html";
+}
 
     localStorage.setItem("challenge1_complete", "true");
     localStorage.setItem("challenge1_score", finalScore);
@@ -239,6 +260,7 @@ window.onload = () => {
 
 </body>
 </html>
+
 
 
 
